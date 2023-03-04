@@ -1,14 +1,14 @@
 # Table of contents
 # Learn more at https://jupyterbook.org/customize/toc.html
-root: intro
+root: about
 format: jb-book
 parts:
 - caption: About
   chapters:
+    - title: Introduction
+      file: chapters/intro
     - title: Geosmart Website
       url: https://geo-smart.github.io/index.html
-    - title: About This Book
-      file: chapters/about
 
 - caption: Dataset Reconstruction
   chapters:

@@ -1,5 +1,15 @@
 # Glossaries
 
+## Topical
+
+```{glossary}
+[Elwah River](https://en.wikipedia.org/wiki/Elwha_River)
+  Located in the Olympic Peninsula, the Elwah River is an important habitat 
+  for Pacific salmon as well as a variety of other fish species. Following 
+  ecological devastation from damming, the area has seen a resurgence thanks
+  to restoration projects in recent years.
+```
+
 ## Tools and Technology
 
 ```{glossary}
@@ -56,10 +66,4 @@
 [MyST](https://myst-parser.readthedocs.io)
   Markedly Structured Text (MyST) is a rich and extensible flavor of Markdown
   meant for technical documentation and publishing. It is used by Jupyter Book.
-
-```
-
-## Topical (Use Case Specific)
-```{glossary}
-< TODO: Fill Out >
 ```
