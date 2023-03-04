@@ -12,7 +12,7 @@ parts:
 
 - caption: Dataset Reconstruction
   chapters:
-    - file: chapters/realignment_skip
+    - file: chapters/realignment
 
 - caption: Further Processing
   chapters:
