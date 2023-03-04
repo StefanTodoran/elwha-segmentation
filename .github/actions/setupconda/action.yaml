@@ -22,7 +22,7 @@ runs:
         miniforge-variant: Mambaforge
         use-mamba: true
         auto-update-conda: false
-        activate-environment: geosmart
+        activate-environment: elwah_env
         use-only-tar-bz2: true # IMPORTANT: This needs to be set for conda package cache to work properly!
 
     - name: Cache Entire Conda Environment
@@ -41,4 +41,4 @@ runs:
         # ENVFILE: conda/conda-${{ runner.os == 'Linux' && 'linux' || 'osx'  }}-64.lock.yml
         ENVFILE: conda/environment.yml
       shell: bash -l {0}
-      run: mamba env update -n geosmart -f $ENVFILE
+      run: mamba env update -n elwah_env -f $ENVFILE
