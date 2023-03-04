@@ -7,62 +7,16 @@ parts:
   chapters:
     - title: Geosmart Website
       url: https://geo-smart.github.io/index.html
-    - title: Project Pythia Foundations
-      url: https://foundations.projectpythia.org/landing-page.html
-    - title: About Use Case Library
+    - title: About This Book
       file: chapters/about
 
-- caption: Chapter One
+- caption: Dataset Reconstruction
   chapters:
-    - file: chapters/motivation
+    - file: chapters/realignment
 
-- caption: Chapter Two
+- caption: Further Processing
   chapters:
-    - file: chapters/methods
-
-- caption: Chapter Three
-  chapters:
-    - file: chapters/data
-
-- caption: Chapter Four
-  chapters:
-    - file: chapters/development
-
-- caption: Chapter Five
-  chapters:
-    - file: chapters/training
-
-- caption: Chapter Six
-  chapters:
-    - file: chapters/evaluation
-
-- caption: Chapter Seven
-  chapters:
-    - file: chapters/workflow
-
-- caption: Chapter Eight
-  chapters:
-    - file: chapters/reproducibility
-
-- caption: Chapter Nine
-  chapters:
-    - file: chapters/conclusion
-
-- caption: Chapter Ten (optional)
-  chapters:
-    - file: chapters/todo
-
-- caption: Chapter Eleven (optional)
-  chapters:
-    - file: chapters/questions
-
-- caption: Chapter Twelve (optional)
-  chapters:
-    - file: chapters/troubleshooting
-
-- caption: Chapter Thirteen
-  chapters:
-    - file: chapters/example
+    - file: chapters/elwah
 
 - caption: Reference
   chapters:

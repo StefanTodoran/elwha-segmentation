@@ -1,14 +1,17 @@
-# `conda env create --name geosmart --file=environment.yml`
-# `conda activate geosmart`
+# `conda env create --name elwah_env --file=environment.yml`
+# `conda activate elwah_env`
 # `conda env update --file environment.yml --prune`
 
-name: geosmart
+name: elwah_env
 channels:
   - conda-forge
+  - defaults
 dependencies:
   - python=3.10
-  - sphinxcontrib-bibtex
-  - jupyter-book=0.13
-  - jupytext
-  - plotly
-  - pandas
+  - pip
+  - numpy
+  - scipy
+  - pillow
+  - matplotlib
+  - pip:
+    - opencv-python

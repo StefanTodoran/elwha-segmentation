@@ -1,3 +1,6 @@
+# Ignore the massive dataset
+book/data
+
 .DS_Store
 
 # Jupyter Book things
