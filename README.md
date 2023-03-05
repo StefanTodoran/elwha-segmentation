@@ -25,3 +25,9 @@ See figure 1.A on alignment below. In order to (roughly) match the IR image to t
 To add even more complexity, images within the RBG and IR image sets are not all distinct, but rather overlap to a large degree, and the plane's flight trajectory means that from one image to the next we see rotation, translation, and scale variance at the same time. See figure 1.B below comparing `airborne_1.png` and `airborne_2.png`. Zone `A` is perfectly matched, which means zone `B` is imperfectly matched and zone `C` is completely misaligned. No matter where one attempts to match the images, without any projection it is impossible two images. Therefore, some sort of affine transformations will be necessary.
 
 <img src="book/img/alignment.png" width="360"/>
+
+## Serving
+
+Activate the `elwah_env` conda environment. Navigate to the root folder of the repository in anaconda prompt. Run `python server.py`.
+
+The server code can take a `--no-build` flag (or `--nb` shorthand) if you don't want to build any changes you've made to the notebooks, and this can just be run from a regular terminal.
