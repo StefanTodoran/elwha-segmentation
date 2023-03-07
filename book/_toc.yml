@@ -18,6 +18,10 @@ parts:
   chapters:
     - file: chapters/elwah
 
+- caption: Dataset Minification
+  chapters:
+    - file: chapters/minify_skip
+
 - caption: Reference
   chapters:
     - file: reference/glossary
