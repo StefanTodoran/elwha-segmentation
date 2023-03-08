@@ -1,5 +1,6 @@
 # Ignore the massive dataset
 book/data/AirborneData.mat
+book/out
 .DS_Store
 
 # Jupyter Book things
