@@ -16,5 +16,6 @@ dependencies:
   - scipy
   - pillow
   - matplotlib
+  - stitching
   - pip:
     - opencv-python

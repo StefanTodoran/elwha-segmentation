@@ -2,6 +2,7 @@
 book/data/AirborneData.mat
 book/out
 .DS_Store
+.vscode
 
 # Jupyter Book things
 .bash_history
