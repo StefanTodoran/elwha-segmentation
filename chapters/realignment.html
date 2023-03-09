@@ -405,11 +405,6 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#problem-statement">
-   Problem Statement
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#getting-started">
    Getting Started
   </a>
@@ -454,11 +449,6 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#problem-statement">
-   Problem Statement
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#getting-started">
    Getting Started
   </a>
@@ -495,17 +485,6 @@ title="Print to PDF"
 <p>The purpose of this project is to prepare RGB and IR images taken of the Elwah river in 2012 for more advanced CV processing like cold water refuge mapping. The dataset is made up of photos taken by an IR camera and an RGB camera. As such, the RGB images and IR images do not align. There is an additional quirk adding complexity: the RGB images overlap, as do the IR images.</p>
 <p>The goal of this project is to develop a process for matching images taken from slightly different camera angles. We will be accomplishing that in this case by stitching together RGB images via feature detection, like a panorama. Then, these stitched images will be transformed and sliced to match their corresponding IR, which will be identified via special feature detection. The final product should be a dataset of unmodified IR images and their corresponding reconstructed RGB matches.</p>
 </section>
-<section id="problem-statement">
-<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Permalink to this headline">#</a></h2>
-<p>In order for more advanced processing such as classification tasks to take place, there is a need to know for any given pixel in any given image both the RGB and IR data at that point. Unfortunately, the IR images are not only misaligned with the RGB images, they are also at a different scale (and perhaps focal length?).</p>
-<p>See figure 1.A on alignment below. In order to (roughly) match the IR image to the RGB image, the IR image had to be shrunken in order to map to the RGB data, despite the fact that the RBG and IR images seemingly have the same size of <code class="docutils literal notranslate"><span class="pre">640x480</span></code>.</p>
-<!-- <video width="320" autoplay loop muted>
-  <source src="../img/alignment2.mp4" type="video/mp4">
-  Figure 1.A
-</video> -->
-<br>
-<a class="reference internal image-reference" href="../_images/alignment2.gif"><img alt="../_images/alignment2.gif" src="../_images/alignment2.gif" style="width: 320px;" /></a>
-<br></section>
 <section id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">#</a></h2>
 <div class="cell docutils container">
@@ -516,6 +495,7 @@ title="Print to PDF"
 <span class="kn">import</span> <span class="nn">cv2</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span> <span class="k">as</span> <span class="n">im</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">stitching</span>
 </pre></div>
 </div>
 </div>
@@ -593,7 +573,7 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/realignment_12_0.png" src="../_images/realignment_12_0.png" />
+<img alt="../_images/realignment_11_0.png" src="../_images/realignment_11_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -627,41 +607,76 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/realignment_15_0.png" src="../_images/realignment_15_0.png" />
+<img alt="../_images/realignment_14_0.png" src="../_images/realignment_14_0.png" />
 </div>
 </div>
 </section>
 <section id="stitching">
 <h2>Stitching<a class="headerlink" href="#stitching" title="Permalink to this headline">#</a></h2>
-<p>Let’s do a quick test to figure out how we will stitch and align our RGB images before we perform the operation on the entire dataset. Since the misalignment factor is constant throughout the dataset (the IR and RGB cameras were on the same plane, just at different angles) the way the first RGB and IR images misalign will be identical to the way the hundreth do.</p>
+<p>The opencv image stitching pipeline is fairly complex. To simplify the process, we can use a python package based on opencv’s stitching module, creatively called <code class="docutils literal notranslate"><span class="pre">stitching</span></code>.</p>
+<p>The first step is to set up our stitcher object. Some experimentation revealed mercator and transverseMercator to be the best for keeping the distortion in our panorama to a minimum.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-	<span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;../out/airborne_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;../out/airborne_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">]</span>
-	<span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;warper_type&quot;</span><span class="p">:</span> <span class="s2">&quot;transverseMercator&quot;</span><span class="p">,</span> <span class="s2">&quot;crop&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="n">stitcher</span> <span class="o">=</span> <span class="n">stitching</span><span class="o">.</span><span class="n">Stitcher</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">failed</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+	
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">stitched</span> <span class="o">=</span> <span class="n">stitcher</span><span class="o">.</span><span class="n">stitch</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;../out/airborne_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;../out/airborne_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">])</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="n">stitched</span><span class="p">)</span>
+  <span class="k">except</span><span class="p">:</span>
+    <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
 
-	<span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
-		<span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-		<span class="n">images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-
-	<span class="n">stitcher</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">Stitcher_create</span><span class="p">()</span>
-	<span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">stitched</span><span class="p">)</span> <span class="o">=</span> <span class="n">stitcher</span><span class="o">.</span><span class="n">stitch</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
-
-	<span class="c1"># status 0 indicates success</span>
-	<span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-		<span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="n">stitched</span><span class="p">)</span>
-	<span class="k">else</span><span class="p">:</span>
-		<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;stitching failed with status </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2"> for images </span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> &lt;-&gt; </span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../out/stitch_1.png&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;stitching failed for the following images:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">failed</span><span class="p">)</span>
+<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../out/stitch_1.png&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/realignment_17_0.png" src="../_images/realignment_17_0.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>stitching failed for the following images:
+ []
+</pre></div>
+</div>
+<img alt="../_images/realignment_17_1.png" src="../_images/realignment_17_1.png" />
 </div>
 </div>
-<p>Eyeballing it, here we can see that the 2nd infrared image aligns with the first and second RGB images. Given that the offset between IR and RGB images is constant (they were attached to the same plane, just at different angles), this means for any IR image <code class="docutils literal notranslate"><span class="pre">x</span></code> we match it with RGB images <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">-</span> <span class="pre">1</span></code>. This means we can match every IR image fully with the exception of the first IR image.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Could avoid a dependency and just use opencv if only the documentation wasn&#39;t super vague about </span>
+<span class="c1"># how to change the warper used. I know the method, but not what to pass it.</span>
+
+<span class="c1"># for x in range(num_images - 1):</span>
+<span class="c1"># 	paths = [f&quot;../out/airborne_{x+1}.png&quot;, f&quot;../out/airborne_{x+2}.png&quot;]</span>
+<span class="c1"># 	images = []</span>
+
+<span class="c1"># 	for path in paths:</span>
+<span class="c1"># 		image = cv2.imread(path)</span>
+<span class="c1"># 		images.append(image)</span>
+
+<span class="c1"># 	stitcher = cv2.Stitcher_create()</span>
+<span class="c1">#   # stitcher.setWarper(cv2.TransverseMercatorWarper)</span>
+<span class="c1"># 	(status, stitched) = stitcher.stitch(images)</span>
+
+<span class="c1"># 	# status 0 indicates success</span>
+<span class="c1"># 	if status == 0:</span>
+<span class="c1"># 		cv2.imwrite(f&quot;../out/stitch_{x+1}.png&quot;, stitched)</span>
+<span class="c1"># 	else:</span>
+<span class="c1"># 		print(f&quot;stitching failed with status {status} for images {x+1} &lt;-&gt; {x+2}&quot;)</span>
+
+<span class="c1"># im.open(&#39;../out/stitch_1.png&#39;)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Eyeballing it, here we can see that the 2nd infrared image aligns with the first and second RGB images. Given that the misalignment factor between IR and RGB images is constant (they were attached to the same plane, just at different angles), this means for any IR image <code class="docutils literal notranslate"><span class="pre">x</span></code> we match it with RGB images <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">-</span> <span class="pre">1</span></code>. This means we can match every IR image fully with the exception of the first IR image.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../out/airborne_ir_2.png&quot;</span><span class="p">)</span>
@@ -669,7 +684,7 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/realignment_19_0.png" src="../_images/realignment_19_0.png" />
+<img alt="../_images/realignment_20_0.png" src="../_images/realignment_20_0.png" />
 </div>
 </div>
 </section>
@@ -711,11 +726,11 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6789 RGB keypoints, 403 IR keypoints
-268 matches found
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6607 RGB keypoints, 403 IR keypoints
+263 matches found
 </pre></div>
 </div>
-<img alt="../_images/realignment_22_1.png" src="../_images/realignment_22_1.png" />
+<img alt="../_images/realignment_23_1.png" src="../_images/realignment_23_1.png" />
 </div>
 </div>
 <p>It seems ORB descriptors don’t do a half bad job, however BRISK descriptors seem to very slightly outperform them here. This makes sense as BRISK has lower variance in response to photometric changes like illumination compared to ORB, which excels at geometric changes. According to <a class="reference external" href="https://arxiv.org/ftp/arxiv/papers/2012/2012.04135.pdf">this</a> paper, KAZE and AKAZE should outperform BRISK for photometric changes.</p>
@@ -746,11 +761,11 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2366 RGB keypoints, 385 IR keypoints
-213 matches found
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2276 RGB keypoints, 385 IR keypoints
+211 matches found
 </pre></div>
 </div>
-<img alt="../_images/realignment_24_1.png" src="../_images/realignment_24_1.png" />
+<img alt="../_images/realignment_25_1.png" src="../_images/realignment_25_1.png" />
 </div>
 </div>
 <p>From this simple test, this seems to be the case, with AKAZE only having 2 erroneous matches in the top 50 best matches, compared to BRISK’s 8 erroneous matches.</p>
@@ -788,7 +803,7 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/realignment_29_0.png" src="../_images/realignment_29_0.png" />
+<img alt="../_images/realignment_30_0.png" src="../_images/realignment_30_0.png" />
 </div>
 </div>
 <p>Great, that seems to match. We will use the relative positions of these coordinates in the RGB image and their corresponding matched coordinates in the IR image to figure out how to map the bounds of the IR image onto the RGB image. Doing this on a per image basis ensures that varying levels of misalignment throughout the dataset don’t matter, since we realign each image based on its own matches.</p>
@@ -866,30 +881,10 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 </div>
 </div>
 </div>
-<p>Now, its time for putting it all together.</p>
+<p>Now, its time for putting it all together. We will use this function to compile our matched keypoints to lists of coordinates, for easy of use.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-  <span class="n">imrgb</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)[:,:,::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># opencv reads BGR so we use this notation to reverse the order</span>
-  <span class="n">imir</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/airborne_ir_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
-
-  <span class="c1"># Initiate AKAZE detector</span>
-  <span class="n">akaze</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">AKAZE_create</span><span class="p">()</span>
-
-  <span class="c1"># find the keypoints and descriptors with BRISK</span>
-  <span class="n">kp1</span><span class="p">,</span> <span class="n">des1</span> <span class="o">=</span> <span class="n">akaze</span><span class="o">.</span><span class="n">detectAndCompute</span><span class="p">(</span><span class="n">imrgb</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-  <span class="n">kp2</span><span class="p">,</span> <span class="n">des2</span> <span class="o">=</span> <span class="n">akaze</span><span class="o">.</span><span class="n">detectAndCompute</span><span class="p">(</span><span class="n">imir</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-  <span class="c1"># create BFMatcher object</span>
-  <span class="n">bf</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">BFMatcher</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">NORM_HAMMING</span><span class="p">,</span> <span class="n">crossCheck</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-  <span class="c1"># Match descriptors</span>
-  <span class="n">matches</span> <span class="o">=</span> <span class="n">bf</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">des1</span><span class="p">,</span> <span class="n">des2</span><span class="p">)</span>
-
-  <span class="c1"># Sort them in the order of their distance</span>
-  <span class="n">matches</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">.</span><span class="n">distance</span><span class="p">)</span>
-
-  <span class="c1"># Compile our coordinates</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compileMatchedCoords</span><span class="p">(</span><span class="n">keypoints1</span><span class="p">,</span> <span class="n">keypoints2</span><span class="p">,</span> <span class="n">matches</span><span class="p">):</span>
   <span class="n">rgb_coords</span> <span class="o">=</span> <span class="p">[]</span>
   <span class="n">ir_coords</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -897,29 +892,217 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
     <span class="n">rgb_kp_index</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">queryIdx</span>
     <span class="n">ir_kp_index</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">trainIdx</span>
 
-    <span class="n">rgb_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kp1</span><span class="p">[</span><span class="n">rgb_kp_index</span><span class="p">]</span><span class="o">.</span><span class="n">pt</span><span class="p">)</span>
-    <span class="n">ir_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kp2</span><span class="p">[</span><span class="n">ir_kp_index</span><span class="p">]</span><span class="o">.</span><span class="n">pt</span><span class="p">)</span>
+    <span class="n">rgb_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">keypoints1</span><span class="p">[</span><span class="n">rgb_kp_index</span><span class="p">]</span><span class="o">.</span><span class="n">pt</span><span class="p">)</span>
+    <span class="n">ir_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">keypoints2</span><span class="p">[</span><span class="n">ir_kp_index</span><span class="p">]</span><span class="o">.</span><span class="n">pt</span><span class="p">)</span>
 
-  <span class="c1"># Find our image bounds</span>
+  <span class="k">return</span> <span class="p">(</span><span class="n">rgb_coords</span><span class="p">,</span> <span class="n">ir_coords</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+  <span class="n">rgb_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span>
+  <span class="n">ir_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/airborne_ir_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">.png&quot;</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ir_path</span><span class="p">)):</span>
+    <span class="k">continue</span>
+
+  <span class="n">im_rgb</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">)[:,:,::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># opencv reads BGR so we use this notation to reverse the order</span>
+  <span class="n">im_ir</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">ir_path</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
+
+  <span class="c1"># Initiate AKAZE detector, find the keypoints and descriptors with BRISK</span>
+  <span class="n">akaze</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">AKAZE_create</span><span class="p">()</span>
+  <span class="n">kp1</span><span class="p">,</span> <span class="n">des1</span> <span class="o">=</span> <span class="n">akaze</span><span class="o">.</span><span class="n">detectAndCompute</span><span class="p">(</span><span class="n">im_rgb</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+  <span class="n">kp2</span><span class="p">,</span> <span class="n">des2</span> <span class="o">=</span> <span class="n">akaze</span><span class="o">.</span><span class="n">detectAndCompute</span><span class="p">(</span><span class="n">im_ir</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+  <span class="c1"># create BFMatcher object</span>
+  <span class="n">bf</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">BFMatcher</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">NORM_HAMMING</span><span class="p">,</span> <span class="n">crossCheck</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+  <span class="c1"># Match descriptors and sort by distance</span>
+  <span class="n">matches</span> <span class="o">=</span> <span class="n">bf</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">des1</span><span class="p">,</span> <span class="n">des2</span><span class="p">)</span>
+  <span class="n">matches</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">.</span><span class="n">distance</span><span class="p">)</span>
+
+  <span class="n">rgb_coords</span><span class="p">,</span> <span class="n">ir_coords</span> <span class="o">=</span> <span class="n">compileMatchedCoords</span><span class="p">(</span><span class="n">kp1</span><span class="p">,</span> <span class="n">kp2</span><span class="p">,</span> <span class="n">matches</span><span class="p">)</span>
   <span class="n">ratios</span> <span class="o">=</span> <span class="n">findPixelRatio</span><span class="p">(</span><span class="n">rgb_coords</span><span class="p">,</span> <span class="n">ir_coords</span><span class="p">)</span>
-  <span class="n">bounds</span> <span class="o">=</span> <span class="n">findImageBounds</span><span class="p">(</span><span class="n">imrgb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">imir</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">ratios</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ratios</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+  <span class="n">bounds</span> <span class="o">=</span> <span class="n">findImageBounds</span><span class="p">(</span><span class="n">im_rgb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">im_ir</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">ratios</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ratios</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
-  <span class="n">imrgb</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
-  <span class="n">imir</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/airborne_ir_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+  <span class="n">im_rgb</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+  <span class="n">im_ir</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">ir_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
 
   <span class="c1"># size must be (width, height) for resize</span>
   <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-  <span class="n">imir</span> <span class="o">=</span> <span class="n">imir</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+  <span class="n">im_ir</span> <span class="o">=</span> <span class="n">im_ir</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
 
-  <span class="n">imrgb</span><span class="o">.</span><span class="n">paste</span><span class="p">(</span><span class="n">imir</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
-  <span class="n">imrgb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/match_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  <span class="n">im_rgb</span><span class="o">.</span><span class="n">paste</span><span class="p">(</span><span class="n">im_ir</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
+  <span class="n">im_rgb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/match_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
   
 <span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../out/match_1.png&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/realignment_36_0.png" src="../_images/realignment_36_0.png" />
+<img alt="../_images/realignment_38_0.png" src="../_images/realignment_38_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">blackToTransparent</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">thresh</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+  <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="c1"># load as np array, BGR</span>
+  <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">thresh</span> <span class="c1"># boolean mask of sum over BGR</span>
+  <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span> <span class="c1"># uint8 to make imread</span>
+
+  <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">img</span><span class="p">,</span> <span class="n">alpha</span><span class="p">))</span>
+  <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">colorInvert</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+  <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_UNCHANGED</span><span class="p">)</span> <span class="c1"># load as np array, BGR</span>
+  
+  <span class="n">b</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+  <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+  <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+  <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+  <span class="n">inv</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">b</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">a</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
+
+  <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">inv</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+  <span class="n">rgb_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span>
+  <span class="n">ir_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/airborne_ir_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">.png&quot;</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ir_path</span><span class="p">)):</span>
+    <span class="k">continue</span>
+
+  <span class="n">im_rgb</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">)[:,:,::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># opencv reads BGR so we use this notation to reverse the order</span>
+  <span class="n">im_ir</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">ir_path</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
+
+  <span class="c1"># Initiate AKAZE detector, find the keypoints and descriptors with BRISK</span>
+  <span class="n">akaze</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">AKAZE_create</span><span class="p">()</span>
+  <span class="n">kp1</span><span class="p">,</span> <span class="n">des1</span> <span class="o">=</span> <span class="n">akaze</span><span class="o">.</span><span class="n">detectAndCompute</span><span class="p">(</span><span class="n">im_rgb</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+  <span class="n">kp2</span><span class="p">,</span> <span class="n">des2</span> <span class="o">=</span> <span class="n">akaze</span><span class="o">.</span><span class="n">detectAndCompute</span><span class="p">(</span><span class="n">im_ir</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+  <span class="c1"># create BFMatcher object</span>
+  <span class="n">bf</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">BFMatcher</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">NORM_HAMMING</span><span class="p">,</span> <span class="n">crossCheck</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+  <span class="c1"># Match descriptors and sort by distance</span>
+  <span class="n">matches</span> <span class="o">=</span> <span class="n">bf</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">des1</span><span class="p">,</span> <span class="n">des2</span><span class="p">)</span>
+  <span class="n">matches</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">.</span><span class="n">distance</span><span class="p">)</span>
+
+  <span class="c1"># APPROACH ONLY DIFFERS AFTER THIS POINT</span>
+
+  <span class="n">rgb_coords</span><span class="p">,</span> <span class="n">ir_coords</span> <span class="o">=</span> <span class="n">compileMatchedCoords</span><span class="p">(</span><span class="n">kp1</span><span class="p">,</span> <span class="n">kp2</span><span class="p">,</span> <span class="n">matches</span><span class="p">)</span>
+  <span class="n">homography</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">findHomography</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ir_coords</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rgb_coords</span><span class="p">),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">RANSAC</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">)</span>
+
+  <span class="c1"># Warp source image to destination based on homography</span>
+  <span class="n">ir_warped</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">warpPerspective</span><span class="p">(</span><span class="n">im_ir</span><span class="p">,</span> <span class="n">homography</span><span class="p">,</span> <span class="p">(</span><span class="n">im_rgb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">im_rgb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+  <span class="n">plt</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/match_alt_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="n">ir_warped</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;hot&quot;</span><span class="p">)</span>
+  <span class="n">blackToTransparent</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/match_alt_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+  <span class="n">im_rgb</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+  <span class="n">mask</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/match_alt_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+
+  <span class="n">im_rgb</span><span class="o">.</span><span class="n">paste</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">mask</span><span class="p">)</span> <span class="c1"># when pasting transparent image, 3rd parameter is mask (uses alpha channel)</span>
+  <span class="n">im_rgb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/match_alt_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  
+<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../out/match_alt_1.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/realignment_40_0.png" src="../_images/realignment_40_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+  <span class="n">rgb_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span>
+  <span class="n">ir_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/airborne_ir_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">.png&quot;</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ir_path</span><span class="p">)):</span>
+    <span class="k">continue</span>
+
+  <span class="n">im_rgb</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">)[:,:,::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># opencv reads BGR so we use this notation to reverse the order</span>
+  <span class="n">im_ir</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">ir_path</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
+
+  <span class="c1"># Initiate AKAZE detector, find the keypoints and descriptors with BRISK</span>
+  <span class="n">akaze</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">AKAZE_create</span><span class="p">()</span>
+  <span class="n">kp1</span><span class="p">,</span> <span class="n">des1</span> <span class="o">=</span> <span class="n">akaze</span><span class="o">.</span><span class="n">detectAndCompute</span><span class="p">(</span><span class="n">im_rgb</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+  <span class="n">kp2</span><span class="p">,</span> <span class="n">des2</span> <span class="o">=</span> <span class="n">akaze</span><span class="o">.</span><span class="n">detectAndCompute</span><span class="p">(</span><span class="n">im_ir</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+  <span class="c1"># create BFMatcher object</span>
+  <span class="n">bf</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">BFMatcher</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">NORM_HAMMING</span><span class="p">,</span> <span class="n">crossCheck</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+  <span class="c1"># Match descriptors and sort by distance</span>
+  <span class="n">matches</span> <span class="o">=</span> <span class="n">bf</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">des1</span><span class="p">,</span> <span class="n">des2</span><span class="p">)</span>
+  <span class="n">matches</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">.</span><span class="n">distance</span><span class="p">)</span>
+
+  <span class="n">rgb_coords</span><span class="p">,</span> <span class="n">ir_coords</span> <span class="o">=</span> <span class="n">compileMatchedCoords</span><span class="p">(</span><span class="n">kp1</span><span class="p">,</span> <span class="n">kp2</span><span class="p">,</span> <span class="n">matches</span><span class="p">)</span>
+  <span class="n">ratios</span> <span class="o">=</span> <span class="n">findPixelRatio</span><span class="p">(</span><span class="n">rgb_coords</span><span class="p">,</span> <span class="n">ir_coords</span><span class="p">)</span>
+  <span class="n">bounds</span> <span class="o">=</span> <span class="n">findImageBounds</span><span class="p">(</span><span class="n">im_rgb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">im_ir</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">ratios</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ratios</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+  <span class="n">background</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">im_rgb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">im_rgb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+  <span class="n">mask</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">im_ir</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">im_ir</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="s2">&quot;black&quot;</span><span class="p">)</span>
+
+  <span class="c1"># Resize mask to bounds found from matches</span>
+  <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># size must be (width, height) for resize</span>
+  <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+  <span class="n">background</span><span class="o">.</span><span class="n">paste</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
+
+  <span class="c1"># This leaves us with a black square and white border</span>
+  <span class="n">background</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/mask_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+
+  <span class="c1"># We want to delete the middle, since its the aligned portion of the image</span>
+  <span class="n">blackToTransparent</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/mask_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+
+  <span class="c1"># We use blackToTransparent to mask away the black pixels, so we invert to</span>
+  <span class="c1"># make our border black (for when it is used on the rgb stitch images)</span>
+  <span class="n">colorInvert</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/mask_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  
+<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../out/mask_1.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/realignment_41_0.png" src="../_images/realignment_41_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+  <span class="n">rgb_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span>
+  <span class="n">mask_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/mask_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">mask_path</span><span class="p">)):</span>
+    <span class="k">continue</span>
+
+  <span class="n">im_rgb</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+  <span class="n">mask</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mask_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+
+  <span class="n">im_rgb</span><span class="o">.</span><span class="n">paste</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">mask</span><span class="p">)</span> <span class="c1"># when pasting transparent image, 3rd parameter is mask (uses alpha channel)</span>
+  <span class="n">im_rgb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/cropped_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+
+  <span class="n">blackToTransparent</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/cropped_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+
+  <span class="c1"># At this point, we should have the aligned section of the RGB image </span>
+  <span class="c1"># surrounded by transparent pixels, and it may be stretched or squeezed</span>
+  <span class="n">uncropped</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/cropped_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  <span class="n">cropped</span> <span class="o">=</span> <span class="n">uncropped</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">uncropped</span><span class="o">.</span><span class="n">getbbox</span><span class="p">())</span>
+  <span class="n">cropped</span> <span class="o">=</span> <span class="n">cropped</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="mi">480</span><span class="p">,</span> <span class="mi">640</span><span class="p">))</span>
+  <span class="n">cropped</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/cropped_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  
+<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../out/cropped_1.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/realignment_42_0.png" src="../_images/realignment_42_0.png" />
 </div>
 </div>
 </section>
