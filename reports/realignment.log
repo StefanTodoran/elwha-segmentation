@@ -17,30 +17,29 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-rgb_images = []
-for x in range(num_images):
-  image_data = im.fromarray(raw_images[:,:,x])
-  rgb_images.append(image_data)
-  image_data.save(f"../out/airborne_{x+1}.png")
+# We only use this running locally, since this data file is too big for Github.
+airborne_data_path = "../data/AirborneData.mat"
+# This allows the code to be runnable on Binder or Colab
+# airborne_data_path = "../data/AirborneDataMini.mat"
 
-display(rgb_images[10])
+# These files are smaller so we don't have to worry about them.
+surfacetemp_data_path = "../data/SurfaceIRtemp.dat"
+meta_data_path = "../data/InsituData.dat"
+
+assert os.path.exists(airborne_data_path)
+assert os.path.exists(surfacetemp_data_path)
+assert os.path.exists(meta_data_path)
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mFileNotFoundError[0m                         Traceback (most recent call last)
-Cell [0;32mIn [6], line 5[0m
-[1;32m      3[0m   image_data [38;5;241m=[39m im[38;5;241m.[39mfromarray(raw_images[:,:,x])
-[1;32m      4[0m   rgb_images[38;5;241m.[39mappend(image_data)
-[0;32m----> 5[0m   [43mimage_data[49m[38;5;241;43m.[39;49m[43msave[49m[43m([49m[38;5;124;43mf[39;49m[38;5;124;43m"[39;49m[38;5;124;43m../out/airborne_[39;49m[38;5;132;43;01m{[39;49;00m[43mx[49m[38;5;241;43m+[39;49m[38;5;241;43m1[39;49m[38;5;132;43;01m}[39;49;00m[38;5;124;43m.png[39;49m[38;5;124;43m"[39;49m[43m)[49m
-[1;32m      7[0m display(rgb_images[[38;5;241m10[39m])
+[0;31mAssertionError[0m                            Traceback (most recent call last)
+Cell [0;32mIn [2], line 10[0m
+[1;32m      7[0m surfacetemp_data_path [38;5;241m=[39m [38;5;124m"[39m[38;5;124m../data/SurfaceIRtemp.dat[39m[38;5;124m"[39m
+[1;32m      8[0m meta_data_path [38;5;241m=[39m [38;5;124m"[39m[38;5;124m../data/InsituData.dat[39m[38;5;124m"[39m
+[0;32m---> 10[0m [38;5;28;01massert[39;00m os[38;5;241m.[39mpath[38;5;241m.[39mexists(airborne_data_path)
+[1;32m     11[0m [38;5;28;01massert[39;00m os[38;5;241m.[39mpath[38;5;241m.[39mexists(surfacetemp_data_path)
+[1;32m     12[0m [38;5;28;01massert[39;00m os[38;5;241m.[39mpath[38;5;241m.[39mexists(meta_data_path)
 
-File [0;32m/usr/share/miniconda3/envs/elwah_env/lib/python3.10/site-packages/PIL/Image.py:2317[0m, in [0;36mImage.save[0;34m(self, fp, format, **params)[0m
-[1;32m   2315[0m         fp [38;5;241m=[39m builtins[38;5;241m.[39mopen(filename, [38;5;124m"[39m[38;5;124mr+b[39m[38;5;124m"[39m)
-[1;32m   2316[0m     [38;5;28;01melse[39;00m:
-[0;32m-> 2317[0m         fp [38;5;241m=[39m [43mbuiltins[49m[38;5;241;43m.[39;49m[43mopen[49m[43m([49m[43mfilename[49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43mw+b[39;49m[38;5;124;43m"[39;49m[43m)[49m
-[1;32m   2319[0m [38;5;28;01mtry[39;00m:
-[1;32m   2320[0m     save_handler([38;5;28mself[39m, fp, filename)
-
-[0;31mFileNotFoundError[0m: [Errno 2] No such file or directory: '../out/airborne_1.png'
-FileNotFoundError: [Errno 2] No such file or directory: '../out/airborne_1.png'
+[0;31mAssertionError[0m: 
+AssertionError: 
 
