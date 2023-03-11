@@ -13,6 +13,7 @@ parts:
 - caption: Dataset Reconstruction
   chapters:
     - file: chapters/realignment
+    - file: chapters/discussion
 
 - caption: Further Processing
   chapters:
