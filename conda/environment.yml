@@ -17,5 +17,5 @@ dependencies:
   - pillow
   - matplotlib
   - pip:
-    - opencv-python
+    - opencv-python-headless
     - stitching

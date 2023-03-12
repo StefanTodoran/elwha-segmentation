@@ -21,3 +21,7 @@ To add even more complexity, images within the RBG and IR image sets are not all
 <br>
 
 <img src="../img/alignment.png" width="50%" style="margin-left: 25%;"/>
+
+## Demo
+
+Below is a link to a video demonstrating the workflow running on the minified dataset in a Binder image. It also includes a portion at the end demonstrating some of the final results from running the workflow on the full dataset.
