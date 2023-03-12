@@ -497,12 +497,16 @@ title="Print to PDF"
 </section>
 <section id="problems-encountered">
 <h2>Problems Encountered<a class="headerlink" href="#problems-encountered" title="Permalink to this headline">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">TODO:</span> <span class="pre">elaborate</span> <span class="pre">on</span> <span class="pre">the</span> <span class="pre">below</span> <span class="pre">issues</span></code></p>
+<p>The realignment of this dataset was no easy task, an many problems were encountered along the way. It could also without a doubt stand to be improved and simplied. Some silly issues included only used the first 50 matches (the homographies were greatly improved by using all matches), or a bug in the difference deviation filtering causing only matches with similar x and y in both images to not be thrown out.</p>
+<p>However, all that aside, a couple of problems stand out:</p>
 <ul class="simple">
-<li><p>determining when to throw out a homography</p></li>
-<li><p>RANSAC not being enough</p></li>
-<li><p>limiting to first 50 matches</p></li>
+<li><p>RANSAC is simply not enough to generate good homographies</p></li>
+<li><p>It is difficult to identify when a homography is poor</p></li>
 </ul>
+<p>Neither of this problems were fully solved in this book, however a great deal of work went into creating workable methods of addressing these problems. The key difficulty is that the second issue of quality assessment needs to be solved first, because having that baseline is the most scientific way of judging progress on the first. The technique settled on was to find a baseline homography by running the matching workflow, and then to compare all matches with this one on future runs. Specifically, the decompositions of the homographies into rotation, translation and normal matrices were compared.</p>
+<p>As for the issue of RANSAC not being enough to sift through the noise and bad keypoint matches, the match filtering approach had two parts. The first, described breifly above I called <code class="docutils literal notranslate"><span class="pre">cross</span> <span class="pre">quadrant</span> <span class="pre">filtering</span></code>, which is the simpler of the two filtering methods and by far the more effective one. Keypoints whose corresponding matched keypoint lie in different quadrants of their respective images are thrown out, with the exception of keypoints very near the image center are these are liable to cross quadrants even if they are a true match.</p>
+<p><img alt="Quadrant Filtering" src="../_images/quadrants.png" /></p>
+<p>The second pass of filtering checks the deviation in <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> of matches. While the numeric value of the difference between a keypoints <code class="docutils literal notranslate"><span class="pre">x</span></code> or <code class="docutils literal notranslate"><span class="pre">y</span></code> value and the <code class="docutils literal notranslate"><span class="pre">x</span></code> or <code class="docutils literal notranslate"><span class="pre">y</span></code> value of its matched keypoint is completely arbitrary, one will notice that true matches tend to form parallel lines in our visualization. This is because their <code class="docutils literal notranslate"><span class="pre">dx</span></code> and <code class="docutils literal notranslate"><span class="pre">dy</span></code> values should be similar relative to each other, as any good projection will leave the IR image mostly flat with minor distortion. Therefore matches whose <code class="docutils literal notranslate"><span class="pre">dx</span></code> and <code class="docutils literal notranslate"><span class="pre">dy</span></code> accross images deviates too far from the median can be thrown out.</p>
 </section>
 <section id="alternative-approaches">
 <h2>Alternative Approaches<a class="headerlink" href="#alternative-approaches" title="Permalink to this headline">#</a></h2>

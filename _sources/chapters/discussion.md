@@ -32,11 +32,20 @@ Generally, the IR image should align with the stitched RGB images very well with
 
 ## Problems Encountered
 
-`TODO: elaborate on the below issues`
+The realignment of this dataset was no easy task, an many problems were encountered along the way. It could also without a doubt stand to be improved and simplied. Some silly issues included only used the first 50 matches (the homographies were greatly improved by using all matches), or a bug in the difference deviation filtering causing only matches with similar x and y in both images to not be thrown out. 
 
-* determining when to throw out a homography
-* RANSAC not being enough
-* limiting to first 50 matches
+However, all that aside, a couple of problems stand out:
+
+* RANSAC is simply not enough to generate good homographies
+* It is difficult to identify when a homography is poor
+
+Neither of this problems were fully solved in this book, however a great deal of work went into creating workable methods of addressing these problems. The key difficulty is that the second issue of quality assessment needs to be solved first, because having that baseline is the most scientific way of judging progress on the first. The technique settled on was to find a baseline homography by running the matching workflow, and then to compare all matches with this one on future runs. Specifically, the decompositions of the homographies into rotation, translation and normal matrices were compared.
+
+As for the issue of RANSAC not being enough to sift through the noise and bad keypoint matches, the match filtering approach had two parts. The first, described breifly above I called `cross quadrant filtering`, which is the simpler of the two filtering methods and by far the more effective one. Keypoints whose corresponding matched keypoint lie in different quadrants of their respective images are thrown out, with the exception of keypoints very near the image center are these are liable to cross quadrants even if they are a true match.
+
+![Quadrant Filtering](../img/quadrants.png)
+
+The second pass of filtering checks the deviation in `x` and `y` of matches. While the numeric value of the difference between a keypoints `x` or `y` value and the `x` or `y` value of its matched keypoint is completely arbitrary, one will notice that true matches tend to form parallel lines in our visualization. This is because their `dx` and `dy` values should be similar relative to each other, as any good projection will leave the IR image mostly flat with minor distortion. Therefore matches whose `dx` and `dy` accross images deviates too far from the median can be thrown out. 
 
 ## Alternative Approaches
 
