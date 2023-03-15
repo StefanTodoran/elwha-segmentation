@@ -1114,7 +1114,7 @@ Loss from ignored poor quality matches: 13.55%
 <p><img alt="Masking Workflow" src="../_images/masking.png" /></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">cropFromAdvancedMask</span><span class="p">():</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">cropFromMask</span><span class="p">():</span>
   <span class="n">rgb_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span>
   <span class="n">mask_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/mask_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span>
   <span class="n">ir_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/airborne_ir_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">.png&quot;</span>
@@ -1161,7 +1161,7 @@ Loss from ignored poor quality matches: 13.55%
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
   <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">poor_quality</span><span class="p">:</span>
-    <span class="n">cropFromAdvancedMask</span><span class="p">()</span>
+    <span class="n">cropFromMask</span><span class="p">()</span>
     <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
   
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully realigned </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> images.&quot;</span><span class="p">)</span>
