@@ -19,26 +19,19 @@ nbclient.exceptions.CellExecutionError: An error occurred while executing the fo
 ------------------
 # We only use this running locally, since this data file is too big for Github.
 airborne_data_path = "../data/AirborneData.mat"
-# This allows the code to be runnable on Binder or Colab
-# airborne_data_path = "../data/AirborneDataMini.mat"
-
-# These files are smaller so we don't have to worry about them.
-surfacetemp_data_path = "../data/SurfaceIRtemp.dat"
-meta_data_path = "../data/InsituData.dat"
+# If you are running on colab, use this instead:
+# airborne_data_path = "elwah_dataset_realignment/book/data/AirborneDataMini.mat"
 
 assert os.path.exists(airborne_data_path)
-assert os.path.exists(surfacetemp_data_path)
-assert os.path.exists(meta_data_path)
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mAssertionError[0m                            Traceback (most recent call last)
-Cell [0;32mIn [2], line 10[0m
-[1;32m      7[0m surfacetemp_data_path [38;5;241m=[39m [38;5;124m"[39m[38;5;124m../data/SurfaceIRtemp.dat[39m[38;5;124m"[39m
-[1;32m      8[0m meta_data_path [38;5;241m=[39m [38;5;124m"[39m[38;5;124m../data/InsituData.dat[39m[38;5;124m"[39m
-[0;32m---> 10[0m [38;5;28;01massert[39;00m os[38;5;241m.[39mpath[38;5;241m.[39mexists(airborne_data_path)
-[1;32m     11[0m [38;5;28;01massert[39;00m os[38;5;241m.[39mpath[38;5;241m.[39mexists(surfacetemp_data_path)
-[1;32m     12[0m [38;5;28;01massert[39;00m os[38;5;241m.[39mpath[38;5;241m.[39mexists(meta_data_path)
+Cell [0;32mIn [3], line 6[0m
+[1;32m      2[0m airborne_data_path [38;5;241m=[39m [38;5;124m"[39m[38;5;124m../data/AirborneData.mat[39m[38;5;124m"[39m
+[1;32m      3[0m [38;5;66;03m# If you are running on colab, use this instead:[39;00m
+[1;32m      4[0m [38;5;66;03m# airborne_data_path = "elwah_dataset_realignment/book/data/AirborneDataMini.mat"[39;00m
+[0;32m----> 6[0m [38;5;28;01massert[39;00m os[38;5;241m.[39mpath[38;5;241m.[39mexists(airborne_data_path)
 
 [0;31mAssertionError[0m: 
 AssertionError: 

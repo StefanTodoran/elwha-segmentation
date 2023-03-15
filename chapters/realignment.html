@@ -525,12 +525,22 @@ title="Print to PDF"
 <li><p>Use this homography to create a mask that extracts only the overlapping portion of the RGB stitch</p></li>
 <li><p>Cut the RGB stitches to create the final reconstructions</p></li>
 </ol>
-<p>The entire workflow can be run with either the <a class="reference external" href="https://www.dropbox.com/s/qkr9712m8jt3zft/AirborneData.mat?dl=0">full dataset</a> or with the minified version included in the Github repository. If you’d like to test out the workflow without cloning it, try Binder:</p>
+<p>The entire workflow can be run with either the <a class="reference external" href="https://www.dropbox.com/s/qkr9712m8jt3zft/AirborneData.mat?dl=0">full dataset</a> or with the minified version included in the Github repository. If you’d like to test out the workflow without cloning it onto your local machine, try Binder or Colab:</p>
 <p><a class="reference external" href="https://mybinder.org/v2/gh/StefanTodoran/elwah_dataset_realignment/HEAD"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a>
 <a class="reference external" href="https://colab.research.google.com/github/StefanTodoran/elwah_dataset_realignment"><img alt="Open in Collab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
 </section>
 <section id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">#</a></h2>
+<p>In this section, we do the necessary set up to be able to begin processing our dataset, including module imports and saving image data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># If running on colab</span>
+<span class="c1"># !pip install stitching</span>
+<span class="c1"># !git clone https://github.com/StefanTodoran/elwah_dataset_realignment.git</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -540,6 +550,10 @@ title="Print to PDF"
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span> <span class="k">as</span> <span class="n">im</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">stitching</span>
+
+<span class="c1"># If running on colab:</span>
+<span class="c1"># import sys</span>
+<span class="c1"># sys.path.insert(1, &#39;elwah_dataset_realignment/book/chapters&#39;)</span>
 <span class="kn">import</span> <span class="nn">util</span>
 </pre></div>
 </div>
@@ -549,16 +563,10 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We only use this running locally, since this data file is too big for Github.</span>
 <span class="n">airborne_data_path</span> <span class="o">=</span> <span class="s2">&quot;../data/AirborneData.mat&quot;</span>
-<span class="c1"># This allows the code to be runnable on Binder or Colab</span>
-<span class="c1"># airborne_data_path = &quot;../data/AirborneDataMini.mat&quot;</span>
-
-<span class="c1"># These files are smaller so we don&#39;t have to worry about them.</span>
-<span class="n">surfacetemp_data_path</span> <span class="o">=</span> <span class="s2">&quot;../data/SurfaceIRtemp.dat&quot;</span>
-<span class="n">meta_data_path</span> <span class="o">=</span> <span class="s2">&quot;../data/InsituData.dat&quot;</span>
+<span class="c1"># If you are running on colab, use this instead:</span>
+<span class="c1"># airborne_data_path = &quot;elwah_dataset_realignment/book/data/AirborneDataMini.mat&quot;</span>
 
 <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">airborne_data_path</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">surfacetemp_data_path</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">meta_data_path</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -618,7 +626,7 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/realignment_11_0.png" src="../_images/realignment_11_0.png" />
+<img alt="../_images/realignment_13_0.png" src="../_images/realignment_13_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -652,7 +660,7 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/realignment_14_0.png" src="../_images/realignment_14_0.png" />
+<img alt="../_images/realignment_16_0.png" src="../_images/realignment_16_0.png" />
 </div>
 </div>
 </section>
@@ -692,7 +700,7 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 Resulting dataset loss: 12.32%
 </pre></div>
 </div>
-<img alt="../_images/realignment_17_1.png" src="../_images/realignment_17_1.png" />
+<img alt="../_images/realignment_19_1.png" src="../_images/realignment_19_1.png" />
 </div>
 </div>
 <p>Stitching will fail for some number of the images. Unfortunately, if there aren’t enough keypoints in the images there isn’t much we can do. We will simply have to remove these images (and their associated IR images) from our dataset.</p>
@@ -705,7 +713,7 @@ Resulting dataset loss: 12.32%
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/realignment_19_0.png" src="../_images/realignment_19_0.png" />
+<img alt="../_images/realignment_21_0.png" src="../_images/realignment_21_0.png" />
 </div>
 </div>
 </section>
@@ -752,7 +760,7 @@ Resulting dataset loss: 12.32%
 252 matches found
 </pre></div>
 </div>
-<img alt="../_images/realignment_22_1.png" src="../_images/realignment_22_1.png" />
+<img alt="../_images/realignment_24_1.png" src="../_images/realignment_24_1.png" />
 </div>
 </div>
 <p>It seems ORB descriptors don’t do a half bad job, however BRISK descriptors seem to very slightly outperform them here (ORB trial not shown). This makes sense as BRISK has lower variance in response to photometric changes like illumination compared to ORB, which excels at geometric changes. According to <a class="reference external" href="https://arxiv.org/ftp/arxiv/papers/2012/2012.04135.pdf">this</a> paper however, KAZE and AKAZE should outperform BRISK for photometric changes (1). In fact, the paper claims KAZE and AKAZE are most invariant to photometric changes out of all opencv detectors and descriptors!</p>
@@ -789,7 +797,7 @@ Resulting dataset loss: 12.32%
 210 matches found
 </pre></div>
 </div>
-<img alt="../_images/realignment_24_1.png" src="../_images/realignment_24_1.png" />
+<img alt="../_images/realignment_26_1.png" src="../_images/realignment_26_1.png" />
 </div>
 </div>
 <p>From this simple test, this seems to be the case, with AKAZE only having ~4 erroneous matches in the top 50 best matches, compared to BRISK’s ~12 erroneous matches. (No need to count by hand to verify which is better, see the output from the match filtering later in this section).</p>
@@ -881,7 +889,7 @@ Resulting dataset loss: 12.32%
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/realignment_30_0.png" src="../_images/realignment_30_0.png" />
+<img alt="../_images/realignment_32_0.png" src="../_images/realignment_32_0.png" />
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Removed 5 bad matches.
 </pre></div>
 </div>
@@ -1067,7 +1075,7 @@ Resulting dataset loss: 12.32%
 Loss from ignored poor quality matches: 13.55%
 </pre></div>
 </div>
-<img alt="../_images/realignment_44_1.png" src="../_images/realignment_44_1.png" />
+<img alt="../_images/realignment_46_1.png" src="../_images/realignment_46_1.png" />
 </div>
 </div>
 <p>Now, we need to repeat essentially the same workflow as above, except instead of projecting and pasting the IR image onto the RGB stitch, we want to use the same homograph but project and paste a mask onto a background, in order to generate a mask that can later be pasted onto the RGB stitch in order to crop it.</p>
@@ -1107,7 +1115,7 @@ Loss from ignored poor quality matches: 13.55%
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/realignment_46_0.png" src="../_images/realignment_46_0.png" />
+<img alt="../_images/realignment_48_0.png" src="../_images/realignment_48_0.png" />
 </div>
 </div>
 <p>With all our masks prepared, the final remaining step is to create a method that can extract our masked RGB data. We need to find our keypoints and homography again, this time so that we can project in the reverse direction. Then, once we cut away all the black pixels we can use the <code class="docutils literal notranslate"><span class="pre">getbbox</span></code> method to crop and resize such that only non-transparent pixels are left.</p>
@@ -1175,7 +1183,7 @@ Loss from ignored poor quality matches: 13.55%
 Percentage of total dataset realigned: 86.21%
 </pre></div>
 </div>
-<img alt="../_images/realignment_50_1.png" src="../_images/realignment_50_1.png" />
+<img alt="../_images/realignment_52_1.png" src="../_images/realignment_52_1.png" />
 </div>
 </div>
 </section>
