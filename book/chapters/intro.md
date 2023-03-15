@@ -24,4 +24,6 @@ To add even more complexity, images within the RBG and IR image sets are not all
 
 ## Demo
 
-Below is a link to a video demonstrating the workflow running on the minified dataset in a Binder image. It also includes a portion at the end demonstrating some of the final results from running the workflow on the full dataset.
+Below is a link to a video demonstrating the dataset realignment workflow and showcasing some of the results. 
+
+[![Watch the Demo](https://img.youtube.com/vi/Y5rqfOQYHj4/maxresdefault.jpg)](https://youtu.be/Y5rqfOQYHj4)
