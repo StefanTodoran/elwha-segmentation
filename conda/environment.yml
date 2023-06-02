@@ -19,3 +19,5 @@ dependencies:
   - pip:
     - opencv-python-headless
     - stitching
+    - torch
+    - torchvision

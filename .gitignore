@@ -1,6 +1,7 @@
 # Ignore the massive dataset
 book/data/AirborneData.mat
 book/out
+book/data/img
 .DS_Store
 .vscode
 

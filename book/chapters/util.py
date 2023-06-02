@@ -1,5 +1,25 @@
 import numpy as np
 
+def getSavePath(type, number) -> str:
+  if (type == "RGB"):
+    return f"../data/img/airborne_{number + 1}.png"
+  if (type == "IR"):
+    return f"../data/img/airborne_ir_{number}.png"
+  
+  if (type == "STITCH"):
+    return f"../out/intermediate/stitch_{number + 1}.png"
+  if (type == "MATCH"):
+    return f"../out/intermediate/match_{number + 1}.png"
+  if (type == "KEYPOINTS"):
+    return f"../out/intermediate/keypoints_{number + 1}.png"
+  if (type == "MASK"):
+    return f"../out/intermediate/mask_{number + 1}.png"
+
+  if (type == "FINAL"):
+    return f"../out/realignment/rgb_{number + 1}.png"
+  else:
+    raise ValueError(f"{type} is not a recognized save type!")
+
 def percentage(loss, total):
   if (hasattr(loss, '__len__')):
     return round(100 * len(loss) / total, 2)
@@ -32,3 +52,8 @@ def getQuadrant(point, dimensions):
 
 def withinThresholdDeviations(value, threshold, baseline):
   return value < baseline + threshold and value > baseline - threshold
+
+def onlyNumeric(seq):
+  seq = str(seq)
+  seq_type= type(seq)
+  return seq_type().join(filter(seq_type.isdigit, seq))

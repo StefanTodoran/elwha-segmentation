@@ -17,6 +17,7 @@ parts:
 
 - caption: Further Processing
   chapters:
+    - file: chapters/masking
     - file: chapters/elwah
 
 - caption: Dataset Minification
