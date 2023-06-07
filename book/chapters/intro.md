@@ -2,7 +2,7 @@
 
 This book contains a python workflow for reconstruction of misaligned image datasets which span multiple colorspaces, and the application of these techniques on a specific dataset. While the techniques are tailored to the specific dataset, the general workflow is intended to be generalizeable.
 
-The dataset in question is made up of 812 RGB and IR aerial photographs taken from a plane flown over the Elwah river in 2012. The purpose of this project is to prepare the dataset for more advanced computer vision processing like cold water refuge mapping.
+The dataset in question is made up of 812 RGB and IR aerial photographs taken from a plane flown over the Elwha river in 2012. The purpose of this project is to prepare the dataset for more advanced computer vision processing like cold water refuge mapping.
 
 ## Problem Statement
 

@@ -1,10 +1,10 @@
-# Elwah Dataset Realignment
+# Elwha Dataset Realignment
 
-[![Deploy](https://github.com/StefanTodoran/elwah_dataset_realignment/actions/workflows/deploy.yaml/badge.svg)](https://github.com/StefanTodoran/elwah_dataset_realignment/actions/workflows/deploy.yaml)
-[![Jupyter Book Badge](https://jupyterbook.org/badge.svg)](https://todoran.dev/elwah_dataset_realignment/)
+[![Deploy](https://github.com/StefanTodoran/elwha_dataset_realignment/actions/workflows/deploy.yaml/badge.svg)](https://github.com/StefanTodoran/elwha_dataset_realignment/actions/workflows/deploy.yaml)
+[![Jupyter Book Badge](https://jupyterbook.org/badge.svg)](https://todoran.dev/elwha_dataset_realignment/)
 [![GeoSMART Use Case](./book/img/use_case_badge.svg)](https://geo-smart.github.io/usecases)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/StefanTodoran/elwah_dataset_realignment/HEAD)
-[![Open in Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/StefanTodoran/elwah_dataset_realignment)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/StefanTodoran/elwha_dataset_realignment/HEAD)
+[![Open in Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/StefanTodoran/elwha_dataset_realignment)
 
 This repository stores a computer vision workflow for aligning offset image datasets which desccribe the same realworld objects but are in difference colorspaces.
 
@@ -12,7 +12,7 @@ This repository stores a computer vision workflow for aligning offset image data
 
 This repository contains a python workflow for reconstruction of misaligned image datasets which span multiple colorspaces, and the application of these techniques on a specific dataset.
 
-The dataset in question is made up of 812 RGB and IR aerial photographs taken from a plane flown over the Elwah river in 2012. The purpose of this project is to prepare the dataset for more advanced computer vision processing like cold water refuge mapping.
+The dataset in question is made up of 812 RGB and IR aerial photographs taken from a plane flown over the Elwha river in 2012. The purpose of this project is to prepare the dataset for more advanced computer vision processing like cold water refuge mapping.
 
 ## Problem Statement
 
@@ -28,6 +28,6 @@ To add even more complexity, images within the RBG and IR image sets are not all
 
 ## Serving
 
-Activate the `elwah_env` conda environment. Navigate to the root folder of the repository in anaconda prompt. Run `python server.py`.
+Activate the `elwha_env` conda environment. Navigate to the root folder of the repository in anaconda prompt. Run `python server.py`.
 
 The server code can take a `--no-build` flag (or `--nb` shorthand) if you don't want to build any changes you've made to the notebooks, and this can just be run from a regular terminal.

@@ -1,8 +1,8 @@
-# `conda env create --name elwah_env --file=environment.yml`
-# `conda activate elwah_env`
+# `conda env create --name elwha_env --file=environment.yml`
+# `conda activate elwha_env`
 # `conda env update --file environment.yml --prune`
 
-name: elwah_env
+name: elwha_env
 channels:
   - conda-forge
   - defaults
@@ -16,6 +16,7 @@ dependencies:
   - scipy
   - pillow
   - matplotlib
+  - freetype=2.10.4
   - pip:
     - opencv-python-headless
     - stitching
