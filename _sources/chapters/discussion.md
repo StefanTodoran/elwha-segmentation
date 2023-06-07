@@ -2,7 +2,7 @@
 
 ## Problem Description
 
-The purpose of this project is to prepare RGB and IR images taken of the Elwah river in 2012 for more advanced CV processing like cold water refuge mapping. The dataset is made up of photos taken by an IR camera and an RGB camera. As such, the RGB images and IR images do not align. There is an additional quirk adding complexity: the RGB images overlap amongst themselves, as do the IR images. For more information, see the book introduction.
+The purpose of this project is to prepare RGB and IR images taken of the Elwha river in 2012 for more advanced CV processing like cold water refuge mapping. The dataset is made up of photos taken by an IR camera and an RGB camera. As such, the RGB images and IR images do not align. There is an additional quirk adding complexity: the RGB images overlap amongst themselves, as do the IR images. For more information, see the book introduction.
 
 <br>
 

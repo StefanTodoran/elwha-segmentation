@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Elwah River Offset Arial Photo Matching &#8212; Elwah Dataset Realignment</title>
+    <title>Elwha River Offset Arial Photo Matching &#8212; Elwha Dataset Realignment</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -99,7 +99,7 @@ const thebe_selector_output = ".output, .cell_output"
       <img src="../_static/GeoSMART_logo.svg" class="logo" alt="logo">
       
       
-      <h1 class="site-logo" id="site-title">Elwah Dataset Realignment</h1>
+      <h1 class="site-logo" id="site-title">Elwha Dataset Realignment</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
@@ -132,7 +132,7 @@ const thebe_selector_output = ".output, .cell_output"
 <ul class="current nav bd-sidenav">
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   Elwah River Offset Arial Photo Matching
+   Elwha River Offset Arial Photo Matching
   </a>
  </li>
  <li class="toctree-l1">
@@ -148,8 +148,8 @@ const thebe_selector_output = ".output, .cell_output"
 </p>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="elwah.html">
-   Cold Water Refuge Mapping
+  <a class="reference internal" href="masking.html">
+   River Boundary Masking
   </a>
  </li>
 </ul>
@@ -240,7 +240,7 @@ title="Toggle navigation"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="https://mybinder.org/v2/gh/StefanTodoran/elwah_dataset_realignment/main?urlpath=lab/tree/book/chapters/realignment.ipynb"
+        <a href="https://mybinder.org/v2/gh/StefanTodoran/elwha_dataset_realignment/main?urlpath=lab/tree/book/chapters/realignment.ipynb"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -283,7 +283,7 @@ title="Fullscreen mode"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="https://github.com/StefanTodoran/elwah_dataset_realignment"
+        <a href="https://github.com/StefanTodoran/elwha_dataset_realignment"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -300,7 +300,7 @@ title="Source repository"
       </li>
       
       <li>
-        <a href="https://github.com/StefanTodoran/elwah_dataset_realignment/issues/new?title=Issue%20on%20page%20%2Fchapters/realignment.html&body=Your%20issue%20content%20here."
+        <a href="https://github.com/StefanTodoran/elwha_dataset_realignment/issues/new?title=Issue%20on%20page%20%2Fchapters/realignment.html&body=Your%20issue%20content%20here."
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -317,7 +317,7 @@ title="Open an issue"
       </li>
       
       <li>
-        <a href="https://github.com/StefanTodoran/elwah_dataset_realignment/edit/main/book/chapters/realignment.ipynb"
+        <a href="https://github.com/StefanTodoran/elwha_dataset_realignment/edit/main/book/chapters/realignment.ipynb"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -453,7 +453,7 @@ title="Print to PDF"
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Elwah River Offset Arial Photo Matching</h1>
+                <h1>Elwha River Offset Arial Photo Matching</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -513,11 +513,11 @@ title="Print to PDF"
                 
               <div>
                 
-  <section class="tex2jax_ignore mathjax_ignore" id="elwah-river-offset-arial-photo-matching">
-<h1>Elwah River Offset Arial Photo Matching<a class="headerlink" href="#elwah-river-offset-arial-photo-matching" title="Permalink to this headline">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="elwha-river-offset-arial-photo-matching">
+<h1>Elwha River Offset Arial Photo Matching<a class="headerlink" href="#elwha-river-offset-arial-photo-matching" title="Permalink to this headline">#</a></h1>
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">#</a></h2>
-<p>In this chapter we outline an approach for matching misaligned cross-modal image datasets and apply the techniques to the Elwah river 2012 aerial dataset. The tutorial is styled with the primary goal of reproducibility and adaptability to similar use cases. The basic outline of the process is as follows:</p>
+<p>In this chapter we outline an approach for matching misaligned cross-modal image datasets and apply the techniques to the Elwha river 2012 aerial dataset. The tutorial is styled with the primary goal of reproducibility and adaptability to similar use cases. The basic outline of the process is as follows:</p>
 <ol class="simple">
 <li><p>Load the data and save the RGB and IR image files to a folder for ease of use</p></li>
 <li><p>Stitch the RGB images together such that for each IR file we have one stitch image it fully overlaps</p></li>
@@ -526,8 +526,8 @@ title="Print to PDF"
 <li><p>Cut the RGB stitches to create the final reconstructions</p></li>
 </ol>
 <p>The entire workflow can be run with either the <a class="reference external" href="https://www.dropbox.com/s/qkr9712m8jt3zft/AirborneData.mat?dl=0">full dataset</a> or with the minified version included in the Github repository. If you’d like to test out the workflow without cloning it onto your local machine, try Binder or Colab:</p>
-<p><a class="reference external" href="https://mybinder.org/v2/gh/StefanTodoran/elwah_dataset_realignment/HEAD"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a>
-<a class="reference external" href="https://colab.research.google.com/github/StefanTodoran/elwah_dataset_realignment"><img alt="Open in Collab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p><a class="reference external" href="https://mybinder.org/v2/gh/StefanTodoran/elwha_dataset_realignment/HEAD"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a>
+<a class="reference external" href="https://colab.research.google.com/github/StefanTodoran/elwha_dataset_realignment"><img alt="Open in Collab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
 </section>
 <section id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">#</a></h2>
@@ -536,7 +536,7 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># If running on colab</span>
 <span class="c1"># !pip install stitching</span>
-<span class="c1"># !git clone https://github.com/StefanTodoran/elwah_dataset_realignment.git</span>
+<span class="c1"># !git clone https://github.com/StefanTodoran/elwha_dataset_realignment.git</span>
 </pre></div>
 </div>
 </div>
@@ -553,7 +553,7 @@ title="Print to PDF"
 
 <span class="c1"># If running on colab:</span>
 <span class="c1"># import sys</span>
-<span class="c1"># sys.path.insert(1, &#39;elwah_dataset_realignment/book/chapters&#39;)</span>
+<span class="c1"># sys.path.insert(1, &#39;elwha_dataset_realignment/book/chapters&#39;)</span>
 <span class="kn">import</span> <span class="nn">util</span>
 </pre></div>
 </div>
@@ -564,7 +564,9 @@ title="Print to PDF"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We only use this running locally, since this data file is too big for Github.</span>
 <span class="n">airborne_data_path</span> <span class="o">=</span> <span class="s2">&quot;../data/AirborneData.mat&quot;</span>
 <span class="c1"># If you are running on colab, use this instead:</span>
-<span class="c1"># airborne_data_path = &quot;elwah_dataset_realignment/book/data/AirborneDataMini.mat&quot;</span>
+<span class="c1"># airborne_data_path = &quot;elwha_dataset_realignment/book/data/AirborneDataMini.mat&quot;</span>
+<span class="c1"># For just using the mini dataset locally:</span>
+<span class="c1"># airborne_data_path = &quot;../data/AirborneDataMini.mat&quot;</span>
 
 <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">airborne_data_path</span><span class="p">)</span>
 </pre></div>
@@ -619,7 +621,7 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span><span class="p">):</span>
   <span class="n">image_data</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">raw_images</span><span class="p">[:,:,</span><span class="n">x</span><span class="p">])</span>
   <span class="n">rgb_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
-  <span class="n">image_data</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/airborne_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  <span class="n">image_data</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
 
 <span class="n">display</span><span class="p">(</span><span class="n">rgb_images</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span>
 </pre></div>
@@ -651,16 +653,18 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span><span class="p">):</span>
   <span class="n">ir_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rot90</span><span class="p">(</span><span class="n">raw_ir_images</span><span class="p">[:,:,</span><span class="n">x</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
   <span class="n">ir_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ir_image</span><span class="p">)</span>
-  <span class="n">plt</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/airborne_ir_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="n">ir_image</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;hot&quot;</span><span class="p">)</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;IR&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">ir_image</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;hot&quot;</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ir_images</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;hot&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="c1"># saved images won&#39;t look quite like this, as they won&#39;t have the white padding</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span> <span class="c1"># saved images won&#39;t look quite like this, as they won&#39;t have the white padding</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/realignment_16_0.png" src="../_images/realignment_16_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(-0.5, 479.5, 639.5, -0.5)
+</pre></div>
+</div>
+<img alt="../_images/realignment_16_1.png" src="../_images/realignment_16_1.png" />
 </div>
 </div>
 </section>
@@ -682,33 +686,33 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
 	
   <span class="k">try</span><span class="p">:</span>
-    <span class="n">stitched</span> <span class="o">=</span> <span class="n">stitcher</span><span class="o">.</span><span class="n">stitch</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;../out/airborne_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;../out/airborne_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">])</span>
-    <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="n">stitched</span><span class="p">)</span>
+    <span class="n">stitched</span> <span class="o">=</span> <span class="n">stitcher</span><span class="o">.</span><span class="n">stitch</span><span class="p">([</span><span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;STITCH&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">stitched</span><span class="p">)</span>
   <span class="k">except</span><span class="p">:</span>
     <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stitching failed for the following images:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">failed</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resulting dataset loss: </span><span class="si">{</span><span class="n">util</span><span class="o">.</span><span class="n">percentage</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">failed</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_images</span><span class="p">)</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
-<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../out/stitch_1.png&quot;</span><span class="p">)</span>
+<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;STITCH&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Stitching failed for the following images:
- [35, 36, 36, 37, 37, 38, 38, 39, 39, 40, 40, 41, 41, 42, 42, 43, 43, 44, 44, 45, 45, 46, 46, 47, 47, 48, 48, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 57, 57, 58, 58, 59, 59, 60, 60, 61, 61, 62, 62, 63, 63, 64, 64, 65, 65, 66, 66, 67, 67, 68, 68, 69, 69, 70, 70, 71, 207, 208, 248, 249, 267, 268, 282, 283, 294, 295, 310, 311, 342, 343, 359, 360, 375, 376, 382, 383, 385, 386, 394, 395, 404, 405, 405, 406]
-Resulting dataset loss: 12.32%
+ [36, 37, 37, 38, 38, 39, 39, 40, 40, 41, 41, 42, 42, 43, 43, 44, 44, 45, 45, 46, 46, 47, 47, 48, 48, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 57, 57, 58, 58, 59, 59, 60, 60, 61, 61, 62, 62, 63, 63, 64, 64, 65, 65, 66, 66, 67, 67, 68, 68, 69, 69, 70, 128, 129, 207, 208, 248, 249, 267, 268, 282, 283, 294, 295, 309, 310, 310, 311, 342, 343, 359, 360, 375, 376, 382, 383, 385, 386, 394, 395, 403, 404, 404, 405, 405, 406]
+Resulting dataset loss: 12.56%
 </pre></div>
 </div>
 <img alt="../_images/realignment_19_1.png" src="../_images/realignment_19_1.png" />
 </div>
 </div>
 <p>Stitching will fail for some number of the images. Unfortunately, if there aren’t enough keypoints in the images there isn’t much we can do. We will simply have to remove these images (and their associated IR images) from our dataset.</p>
-<p>Although a loss of rougly <code class="docutils literal notranslate"><span class="pre">12%</span></code> may seem high, if we examine the images our stitching failed on, it seems a full <code class="docutils literal notranslate"><span class="pre">8%</span></code> aren’t even images of the elwah river (#34 - #70) but rather images taken when the plane was turning around. Some of the later fails occur as the plane is descending and the image quality is poorer, as well as further inland where the area is more forested and there are less quality keypoints.</p>
-<p>Moving on, here we can see that the 2nd infrared image aligns with the first and second RGB images. Given that the misalignment factor between IR and RGB images is constant (they were attached to the same plane, just at different angles), this means for any IR image <code class="docutils literal notranslate"><span class="pre">x</span></code> we match it with RGB images <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">-</span> <span class="pre">1</span></code>. This means we can match every IR image fully with the exception of the first IR image.</p>
+<p>Although a loss of rougly <code class="docutils literal notranslate"><span class="pre">12%</span></code> may seem high, if we examine the images our stitching failed on, it seems a full <code class="docutils literal notranslate"><span class="pre">8%</span></code> aren’t even images of the elwha river (#34 - #70) but rather images taken when the plane was turning around. Some of the later fails occur as the plane is descending and the image quality is poorer, as well as further inland where the area is more forested and there are less quality keypoints.</p>
+<p>Moving on, here we can see that the first infrared image aligns with the first and second RGB images. Given that the misalignment factor between IR and RGB images is constant (they were attached to the same plane, just at different angles), this means for any IR image <code class="docutils literal notranslate"><span class="pre">x</span></code> we match it with RGB images <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">1</span></code>. This means we can match every IR image fully with the exception of the first IR image.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../out/airborne_ir_2.png&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;IR&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -722,8 +726,8 @@ Resulting dataset loss: 12.32%
 <p>Now, we have to figure out what kind of descriptors we are going to use to figure out the alignment of the IR and RGB images. For a dataset where it is not as immediately obvious which images overlap with which and eyeballing it isn’t going to cut it, the application of keypoints and descriptors could be used to match the images, but we will only be using them to figure out how to crop the stitched RGB images.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im_rgb</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;../out/stitch_1.png&#39;</span><span class="p">)[:,:,::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># opencv reads BGR so we use this notation to reverse the order</span>
-<span class="n">im_ir</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;../out/airborne_ir_2.png&#39;</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im_rgb</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;STITCH&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))[:,:,::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># opencv reads BGR so we use this notation to reverse the order</span>
+<span class="n">im_ir</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;IR&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -756,8 +760,8 @@ Resulting dataset loss: 12.32%
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6846 RGB keypoints, 403 IR keypoints
-252 matches found
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6779 RGB keypoints, 403 IR keypoints
+262 matches found
 </pre></div>
 </div>
 <img alt="../_images/realignment_24_1.png" src="../_images/realignment_24_1.png" />
@@ -793,8 +797,8 @@ Resulting dataset loss: 12.32%
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2272 RGB keypoints, 385 IR keypoints
-210 matches found
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2265 RGB keypoints, 385 IR keypoints
+208 matches found
 </pre></div>
 </div>
 <img alt="../_images/realignment_26_1.png" src="../_images/realignment_26_1.png" />
@@ -890,7 +894,7 @@ Resulting dataset loss: 12.32%
 </div>
 <div class="cell_output docutils container">
 <img alt="../_images/realignment_32_0.png" src="../_images/realignment_32_0.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Removed 5 bad matches.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Removed 1 bad matches.
 </pre></div>
 </div>
 </div>
@@ -964,7 +968,7 @@ Resulting dataset loss: 12.32%
 </section>
 <section id="quality-control">
 <h2>Quality Control<a class="headerlink" href="#quality-control" title="Permalink to this headline">#</a></h2>
-<p>This part is the most informal part of the workflow, but is a useful step and one that is difficult to automate and abstract away. Two cells below under <code class="docutils literal notranslate"><span class="pre">Mapping</span></code> we put it all together, with a loop over all our images which projects and then pastes each IR image onto its corresponding RGB stitch.</p>
+<p>This part is the most informal part of the workflow, but is a useful step and one that is difficult to automate and abstract away. Two cells below, under the <code class="docutils literal notranslate"><span class="pre">Mapping</span></code> section, we put it all together, with a loop over all our images which projects and then pastes each IR image onto its corresponding RGB stitch.</p>
 <p>We need to run that code to generate all of the matched images. Then, we need to go through the images by hand and select a baseline homography. This should be an image that is transformed and matched in a way that will be similar to much of the dataset. Finally, by looking through the input we need to select some appropriate thresholds. This can be done by manually searching through the images and manually picking thresholds based on the differences in values for good and poor matches.</p>
 <p>You may also need to modify <code class="docutils literal notranslate"><span class="pre">center_threshold</span></code>, <code class="docutils literal notranslate"><span class="pre">dx_threshold</span></code>, and <code class="docutils literal notranslate"><span class="pre">dy_threshold</span></code> in the match filtering code from earlier. The homography related thresholds determine which homographies are considered “bad” and excluded from the final reconstructed dataset, while the thresholds in the match filtering code directly affect how good the homographies actually are.</p>
 <p>This is a fairly subjective process, but in essence it can be done via trial and error, running the workflow with certain values and examining if there are any outputs that are very poor reconstructions. If there are, we need to examine the associated homography and bounds to re-evaluate our thresholds.</p>
@@ -985,7 +989,7 @@ Resulting dataset loss: 12.32%
 </div>
 </div>
 </div>
-<p>Obviously the values have already been determined and are in the cell above and the cell below. However, the described process is useful for understand where these values came from.</p>
+<p>Obviously the values have already been determined and are in the cell above and the cell below. However, the described process is useful for understanding where these values came from.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">homography_threshold</span> <span class="o">=</span> <span class="mi">150</span>
@@ -1027,9 +1031,9 @@ Resulting dataset loss: 12.32%
 <span class="n">bad_matches</span> <span class="o">=</span> <span class="mi">0</span>
 
 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-  <span class="n">rgb_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span>
-  <span class="n">ir_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/airborne_ir_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">.png&quot;</span>
-  <span class="n">match_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/match_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span>
+  <span class="n">rgb_path</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;STITCH&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+  <span class="n">ir_path</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;IR&quot;</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="n">match_path</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;MATCH&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 
   <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ir_path</span><span class="p">)):</span>
     <span class="k">continue</span>
@@ -1038,7 +1042,7 @@ Resulting dataset loss: 12.32%
   <span class="n">im_ir</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">ir_path</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
 
   <span class="c1"># Get our keypoints matched and into a usable for for the homography</span>
-  <span class="n">homography</span> <span class="o">=</span> <span class="n">getHomography</span><span class="p">(</span><span class="n">im_rgb</span><span class="p">,</span> <span class="n">im_ir</span><span class="p">,</span> <span class="n">save_matches</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;../out/keypoints_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  <span class="n">homography</span> <span class="o">=</span> <span class="n">getHomography</span><span class="p">(</span><span class="n">im_rgb</span><span class="p">,</span> <span class="n">im_ir</span><span class="p">,</span> <span class="n">save_matches</span><span class="o">=</span><span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;KEYPOINTS&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
 
   <span class="k">if</span> <span class="n">homography</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">poor_quality</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -1065,14 +1069,14 @@ Resulting dataset loss: 12.32%
   
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Poor matches found for the following images: (note, poor quality for image x indicates match_x+1 is poor)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">poor_quality</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loss from ignored poor quality matches: </span><span class="si">{</span><span class="n">util</span><span class="o">.</span><span class="n">percentage</span><span class="p">(</span><span class="n">poor_quality</span><span class="p">,</span> <span class="n">num_images</span><span class="p">)</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
-<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../out/match_1.png&#39;</span><span class="p">)</span>
+<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;MATCH&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Poor matches found for the following images: (note, poor quality for image x indicates match_x+1 is poor)
- [32, 33, 70, 147, 150, 151, 163, 173, 176, 186, 207, 208, 211, 212, 213, 214, 234, 236, 240, 250, 262, 264, 265, 267, 269, 270, 284, 286, 287, 291, 292, 294, 295, 296, 297, 298, 303, 304, 305, 306, 308, 323, 329, 330, 331, 332, 333, 334, 335, 336, 337, 355, 357, 389, 394]
-Loss from ignored poor quality matches: 13.55%
+ [32, 33, 34, 69, 109, 110, 138, 145, 147, 148, 149, 150, 151, 165, 173, 175, 186, 204, 207, 208, 209, 211, 212, 213, 214, 222, 236, 240, 245, 250, 264, 265, 267, 269, 270, 274, 284, 285, 286, 287, 288, 291, 295, 296, 298, 300, 302, 303, 304, 305, 307, 308, 329, 330, 331, 332, 333, 334, 335, 336, 337, 339, 389]
+Loss from ignored poor quality matches: 15.52%
 </pre></div>
 </div>
 <img alt="../_images/realignment_46_1.png" src="../_images/realignment_46_1.png" />
@@ -1083,8 +1087,9 @@ Loss from ignored poor quality matches: 13.55%
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-  <span class="n">rgb_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span>
-  <span class="n">ir_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/airborne_ir_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">.png&quot;</span>
+  <span class="n">rgb_path</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;STITCH&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+  <span class="n">ir_path</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;IR&quot;</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="n">mask_path</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;MASK&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 
   <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ir_path</span><span class="p">)):</span>
     <span class="k">continue</span>
@@ -1102,15 +1107,15 @@ Loss from ignored poor quality matches: 13.55%
 
   <span class="c1"># we currently have a white rectange projected onto a black background. We need</span>
   <span class="c1"># to invert this so we can cut out the rectangle using blackToTransparent.</span>
-  <span class="n">plt</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/mask_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="n">mask_warped</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;png&quot;</span><span class="p">)</span>
-  <span class="n">colorInvert</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/mask_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">mask_path</span><span class="p">,</span> <span class="n">mask_warped</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;png&quot;</span><span class="p">)</span>
+  <span class="n">colorInvert</span><span class="p">(</span><span class="n">mask_path</span><span class="p">)</span>
 
   <span class="c1"># Because of the rotation, some edge pixels are between black and white, we can just </span>
   <span class="c1"># remove all of these, so we treat any non-fully white pixel as black. 255*3 - 1 = 764</span>
-  <span class="n">blackToTransparent</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/mask_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="mi">764</span><span class="p">)</span>
-  <span class="n">colorInvert</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/mask_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span> <span class="c1"># One final color invert since we always cut black pixels</span>
+  <span class="n">blackToTransparent</span><span class="p">(</span><span class="n">mask_path</span><span class="p">,</span> <span class="mi">764</span><span class="p">)</span>
+  <span class="n">colorInvert</span><span class="p">(</span><span class="n">mask_path</span><span class="p">)</span> <span class="c1"># One final color invert since we always cut black pixels</span>
   
-<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../out/mask_1.png&#39;</span><span class="p">)</span>
+<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;MASK&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1123,9 +1128,10 @@ Loss from ignored poor quality matches: 13.55%
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">cropFromMask</span><span class="p">():</span>
-  <span class="n">rgb_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/stitch_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span>
-  <span class="n">mask_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/mask_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span>
-  <span class="n">ir_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;../out/airborne_ir_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="si">}</span><span class="s2">.png&quot;</span>
+  <span class="n">rgb_path</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;STITCH&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+  <span class="n">mask_path</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;MASK&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+  <span class="n">ir_path</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;IR&quot;</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="n">final_path</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;FINAL&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 
   <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rgb_path</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">mask_path</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ir_path</span><span class="p">)):</span>
     <span class="k">return</span> <span class="kc">False</span>
@@ -1139,20 +1145,20 @@ Loss from ignored poor quality matches: 13.55%
   <span class="n">inv_homography</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">homography</span><span class="p">)</span>
 
   <span class="n">im_rgb</span><span class="o">.</span><span class="n">paste</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">mask</span><span class="p">)</span> <span class="c1"># when pasting transparent image, 3rd parameter is mask (uses alpha channel)</span>
-  <span class="n">im_rgb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/cropped_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  <span class="n">im_rgb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">final_path</span><span class="p">)</span>
 
-  <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/cropped_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">final_path</span><span class="p">)</span>
   <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">warpPerspective</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">inv_homography</span><span class="p">,</span> <span class="p">(</span><span class="n">np_rgb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">np_rgb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-  <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/cropped_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
+  <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">final_path</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
 
-  <span class="n">blackToTransparent</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/cropped_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  <span class="n">blackToTransparent</span><span class="p">(</span><span class="n">final_path</span><span class="p">)</span>
 
   <span class="c1"># At this point, we should have the aligned section of the RGB image </span>
   <span class="c1"># surrounded by transparent pixels, and it may be stretched or squeezed</span>
-  <span class="n">uncropped</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/cropped_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  <span class="n">uncropped</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">final_path</span><span class="p">)</span>
   <span class="n">cropped</span> <span class="o">=</span> <span class="n">uncropped</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">uncropped</span><span class="o">.</span><span class="n">getbbox</span><span class="p">())</span>
   <span class="n">cropped</span> <span class="o">=</span> <span class="n">cropped</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="mi">480</span><span class="p">,</span> <span class="mi">640</span><span class="p">))</span>
-  <span class="n">cropped</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../out/cropped_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+  <span class="n">cropped</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">final_path</span><span class="p">)</span>
 
   <span class="k">return</span> <span class="kc">True</span>
 </pre></div>
@@ -1174,13 +1180,13 @@ Loss from ignored poor quality matches: 13.55%
   
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully realigned </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> images.&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Percentage of total dataset realigned: </span><span class="si">{</span><span class="n">util</span><span class="o">.</span><span class="n">percentage</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">num_images</span><span class="p">)</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
-<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../out/cropped_1.png&#39;</span><span class="p">)</span>
+<span class="n">im</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">getSavePath</span><span class="p">(</span><span class="s2">&quot;FINAL&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Successfully realigned 350 images.
-Percentage of total dataset realigned: 86.21%
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Successfully realigned 342 images.
+Percentage of total dataset realigned: 84.24%
 </pre></div>
 </div>
 <img alt="../_images/realignment_52_1.png" src="../_images/realignment_52_1.png" />

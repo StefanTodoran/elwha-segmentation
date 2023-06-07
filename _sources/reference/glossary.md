@@ -3,8 +3,8 @@
 ## Topical
 
 ```{glossary}
-[Elwah River](https://en.wikipedia.org/wiki/Elwha_River)
-  Located in the Olympic Peninsula, the Elwah River is an important habitat 
+[Elwha River](https://en.wikipedia.org/wiki/Elwha_River)
+  Located in the Olympic Peninsula, the Elwha River is an important habitat 
   for Pacific salmon as well as a variety of other fish species. Following 
   ecological devastation from damming, the area has seen a resurgence thanks
   to restoration projects in recent years.
