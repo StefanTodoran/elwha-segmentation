@@ -16,7 +16,6 @@ dependencies:
   - scipy
   - pillow
   - matplotlib
-  - freetype=2.10.4
   - pip:
     - opencv-python-headless
     - stitching
