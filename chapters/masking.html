@@ -54,7 +54,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Tutorial on Dataset Minification" href="minify_skip.html" />
+    <link rel="next" title="Cold Water Refuge Mapping" href="elwha.html" />
     <link rel="prev" title="Dataset Realignment Discussion" href="discussion.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -150,6 +150,11 @@ const thebe_selector_output = ".output, .cell_output"
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    River Boundary Masking
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="elwha.html">
+   Cold Water Refuge Mapping
   </a>
  </li>
 </ul>
@@ -752,45 +757,6 @@ Subset of 4 ground truth segmentation masks marked for Train.
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">46</span><span class="p">],</span> <span class="n">line</span> <span class="mi">6</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">input_image</span> <span class="o">=</span> <span class="n">image</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="c1"># input_image = datapoint[&quot;rgb&quot;]</span>
-<span class="ne">----&gt; </span><span class="mi">6</span> <span class="n">input_image</span> <span class="o">=</span> <span class="n">input_image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">preprocess</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span>     <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span>     <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]),</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="p">])</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="n">input_tensor</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">input_image</span><span class="p">)</span>
-
-<span class="nn">File c:\Users\stodo\anaconda3\envs\elwah_env\lib\site-packages\PIL\Image.py:889,</span> in <span class="ni">Image.convert</span><span class="nt">(self, mode, matrix, dither, palette, colors)</span>
-<span class="g g-Whitespace">    </span><span class="mi">847</span> <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">matrix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dither</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">WEB</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="mi">256</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">848</span>     <span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">849</span><span class="sd">     Returns a converted copy of this image. For the &quot;P&quot; mode, this</span>
-<span class="g g-Whitespace">    </span><span class="mi">850</span><span class="sd">     method translates pixels through the palette.  If mode is</span>
-<span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">886</span><span class="sd">     :returns: An :py:class:`~PIL.Image.Image` object.</span>
-<span class="g g-Whitespace">    </span><span class="mi">887</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">889</span>     <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">891</span>     <span class="n">has_transparency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;transparency&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-<span class="g g-Whitespace">    </span><span class="mi">892</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;P&quot;</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">893</span>         <span class="c1"># determine default mode</span>
-
-<span class="nn">File c:\Users\stodo\anaconda3\envs\elwah_env\lib\site-packages\PIL\ImageFile.py:226,</span> in <span class="ni">ImageFile.load</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">222</span> <span class="n">decoder</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">_getdecoder</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">223</span>     <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">decoder_name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoderconfig</span>
-<span class="g g-Whitespace">    </span><span class="mi">224</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">225</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">226</span>     <span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">227</span>     <span class="n">decoder</span><span class="o">.</span><span class="n">setimage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">im</span><span class="p">,</span> <span class="n">extents</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">228</span>     <span class="k">if</span> <span class="n">decoder</span><span class="o">.</span><span class="n">pulls_fd</span><span class="p">:</span>
-
-<span class="ne">ValueError</span>: seek of closed file
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -809,7 +775,12 @@ Subset of 4 ground truth segmentation masks marked for Train.
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/masking_11_0.png" src="../_images/masking_11_0.png" />
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="n">Canceled</span> <span class="n">future</span> <span class="k">for</span> <span class="n">execute_request</span> <span class="n">message</span> <span class="n">before</span> <span class="n">replies</span> <span class="n">were</span> <span class="n">done</span>
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">Kernel</span> <span class="n">crashed</span> <span class="k">while</span> <span class="n">executing</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">the</span> <span class="n">current</span> <span class="n">cell</span> <span class="ow">or</span> <span class="n">a</span> <span class="n">previous</span> <span class="n">cell</span><span class="o">.</span> <span class="n">Please</span> <span class="n">review</span> <span class="n">the</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">cell</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">to</span> <span class="n">identify</span> <span class="n">a</span> <span class="n">possible</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">failure</span><span class="o">.</span> <span class="n">Click</span> <span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s1">&#39;https://aka.ms/vscodeJupyterKernelCrash&#39;</span><span class="o">&gt;</span><span class="n">here</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span> <span class="k">for</span> <span class="n">more</span> <span class="n">info</span><span class="o">.</span> <span class="n">View</span> <span class="n">Jupyter</span> <span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s1">&#39;command:jupyter.viewOutput&#39;</span><span class="o">&gt;</span><span class="n">log</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span> <span class="k">for</span> <span class="n">further</span> <span class="n">details</span><span class="o">.</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="cell docutils container">
@@ -863,10 +834,10 @@ Subset of 4 ground truth segmentation masks marked for Train.
             <p class="prev-next-title">Dataset Realignment Discussion</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="minify_skip.html" title="next page">
+    <a class='right-next' id="next-link" href="elwha.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Tutorial on Dataset Minification</p>
+        <p class="prev-next-title">Cold Water Refuge Mapping</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
