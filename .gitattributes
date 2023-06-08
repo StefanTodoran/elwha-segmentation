@@ -1,3 +1,3 @@
-mask.ipynb linguist-vendored
-minify_skip.ipynb linguist-vendored
-elwha.ipynb linguist-vendored
+book/chapters/mask.ipynb -linguist-detectable
+book/chapters/minify_skip.ipynb -linguist-detectable
+book/chapters/elwha.ipynb -linguist-detectable
