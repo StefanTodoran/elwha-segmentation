@@ -487,6 +487,19 @@ ir_image_{x} matches with cropped_{x-1} and with truth_{x}</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 640x480 with 0 Axes&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Adapted from Manpreet Singh Minhas&#39;s transfer learning</span>
 <span class="sd">for semantic segmentation tutorial.</span>
@@ -674,9 +687,9 @@ Subset of 4 ground truth segmentation masks marked for Train.
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/masking_6_0.png" src="../_images/masking_6_0.png" />
-<img alt="../_images/masking_6_1.png" src="../_images/masking_6_1.png" />
-<img alt="../_images/masking_6_2.png" src="../_images/masking_6_2.png" />
+<img alt="../_images/masking_7_0.png" src="../_images/masking_7_0.png" />
+<img alt="../_images/masking_7_1.png" src="../_images/masking_7_1.png" />
+<img alt="../_images/masking_7_2.png" src="../_images/masking_7_2.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -684,7 +697,6 @@ Subset of 4 ground truth segmentation masks marked for Train.
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot; DeepLabv3 Model download and change the head for your prediction&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">torchvision.models.segmentation.deeplabv3</span> <span class="kn">import</span> <span class="n">DeepLabHead</span>
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">models</span>
-
 
 <span class="k">def</span> <span class="nf">createDeepLabv3</span><span class="p">(</span><span class="n">outputchannels</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;DeepLabv3 class with custom head</span>
@@ -713,7 +725,7 @@ Subset of 4 ground truth segmentation masks marked for Train.
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/masking_8_0.png" src="../_images/masking_8_0.png" />
+<img alt="../_images/masking_9_0.png" src="../_images/masking_9_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -727,7 +739,7 @@ Subset of 4 ground truth segmentation masks marked for Train.
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/masking_9_0.png" src="../_images/masking_9_0.png" />
+<img alt="../_images/masking_10_0.png" src="../_images/masking_10_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -760,6 +772,19 @@ Subset of 4 ground truth segmentation masks marked for Train.
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 640x480 with 0 Axes&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create a color pallette, selecting a color for each class</span>
 <span class="n">palette</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">2</span> <span class="o">**</span> <span class="mi">25</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">15</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">21</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
 <span class="n">colors</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">21</span><span class="p">)])[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">palette</span>
@@ -768,17 +793,10 @@ Subset of 4 ground truth segmentation masks marked for Train.
 <span class="c1"># plot the semantic segmentation predictions of 21 classes in each color</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">output_predictions</span><span class="o">.</span><span class="n">byte</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">input_image</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
 <span class="n">r</span><span class="o">.</span><span class="n">putpalette</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;test.png&quot;</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="n">Canceled</span> <span class="n">future</span> <span class="k">for</span> <span class="n">execute_request</span> <span class="n">message</span> <span class="n">before</span> <span class="n">replies</span> <span class="n">were</span> <span class="n">done</span>
-</pre></div>
-</div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">Kernel</span> <span class="n">crashed</span> <span class="k">while</span> <span class="n">executing</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">the</span> <span class="n">current</span> <span class="n">cell</span> <span class="ow">or</span> <span class="n">a</span> <span class="n">previous</span> <span class="n">cell</span><span class="o">.</span> <span class="n">Please</span> <span class="n">review</span> <span class="n">the</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">cell</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">to</span> <span class="n">identify</span> <span class="n">a</span> <span class="n">possible</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">failure</span><span class="o">.</span> <span class="n">Click</span> <span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s1">&#39;https://aka.ms/vscodeJupyterKernelCrash&#39;</span><span class="o">&gt;</span><span class="n">here</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span> <span class="k">for</span> <span class="n">more</span> <span class="n">info</span><span class="o">.</span> <span class="n">View</span> <span class="n">Jupyter</span> <span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s1">&#39;command:jupyter.viewOutput&#39;</span><span class="o">&gt;</span><span class="n">log</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span> <span class="k">for</span> <span class="n">further</span> <span class="n">details</span><span class="o">.</span>
+<span class="c1"># plt.imshow(r)</span>
+<span class="c1"># plt.show()</span>
 </pre></div>
 </div>
 </div>

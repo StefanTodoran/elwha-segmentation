@@ -35,7 +35,7 @@ loader = DataLoader(data, batch_size=1, shuffle=False, num_workers=12)
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mOSError[0m                                   Traceback (most recent call last)
-Cell [0;32mIn [3], line 10[0m
+Cell [0;32mIn [4], line 10[0m
 [1;32m      7[0m truth_folder [38;5;241m=[39m [38;5;124m"[39m[38;5;124mout/segmentation/[39m[38;5;124m"[39m
 [1;32m      8[0m truth_prefix [38;5;241m=[39m [38;5;124m"[39m[38;5;124mtruth_[39m[38;5;124m"[39m
 [0;32m---> 10[0m data [38;5;241m=[39m [43mSegmentationDataset[49m[43m([49m
@@ -44,7 +44,7 @@ Cell [0;32mIn [3], line 10[0m
 [1;32m     13[0m [43m)[49m
 [1;32m     14[0m loader [38;5;241m=[39m DataLoader(data, batch_size[38;5;241m=[39m[38;5;241m1[39m, shuffle[38;5;241m=[39m[38;5;28;01mFalse[39;00m, num_workers[38;5;241m=[39m[38;5;241m12[39m)
 
-Cell [0;32mIn [2], line 57[0m, in [0;36mSegmentationDataset.__init__[0;34m(self, root, ir_folder, rgb_folder, masks_folder, ir_prefix, rgb_prefix, masks_prefix, transforms, seed, fraction, subset, mask_color_mode)[0m
+Cell [0;32mIn [3], line 57[0m, in [0;36mSegmentationDataset.__init__[0;34m(self, root, ir_folder, rgb_folder, masks_folder, ir_prefix, rgb_prefix, masks_prefix, transforms, seed, fraction, subset, mask_color_mode)[0m
 [1;32m     54[0m mask_images_path [38;5;241m=[39m Path([38;5;28mself[39m[38;5;241m.[39mroot) [38;5;241m/[39m masks_folder
 [1;32m     56[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m ir_images_path[38;5;241m.[39mexists():
 [0;32m---> 57[0m   [38;5;28;01mraise[39;00m [38;5;167;01mOSError[39;00m([38;5;124mf[39m[38;5;124m"[39m[38;5;132;01m{[39;00mir_images_path[38;5;132;01m}[39;00m[38;5;124m does not exist.[39m[38;5;124m"[39m)
