@@ -16,8 +16,14 @@ dependencies:
   - scipy
   - pillow
   - matplotlib
+
+  # Install should be through conda forge, if matplotlib is crashing
+  # the kernel, try running `conda install nomkl --channel conda-forge`
+  - nomkl 
+
   - pip:
     - opencv-python-headless
     - stitching
     - torch
     - torchvision
+    - git+https://github.com/facebookresearch/segment-anything.git
