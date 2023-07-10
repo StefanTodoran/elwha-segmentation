@@ -537,14 +537,14 @@ ir_image_{x} matches with cropped_{x-1} and with truth_{x}</p>
 <span class="sd">          a sample and returns a transformed version. E.g, ``transforms.ToTensor`` for images.</span>
 <span class="sd">      seed (int, optional): Specify a seed for the train and test split for reproducible results. Defaults to None.</span>
 <span class="sd">      fraction (float, optional): A float value from 0 to 1 which specifies the validation split fraction. Defaults to None.</span>
-<span class="sd">      subset (str, optional): &#39;Train&#39; or &#39;Test&#39; to select the appropriate set. Defaults to None.</span>
+<span class="sd">      subset (str, optional): &quot;Train&quot; or &quot;Test&quot; to select the appropriate set. Defaults to None.</span>
 
-<span class="sd">      mask_color_mode (str, optional): &#39;rgb&#39; or &#39;grayscale&#39;. Defaults to &#39;grayscale&#39;.</span>
+<span class="sd">      mask_color_mode (str, optional): &quot;rgb&quot; or &quot;grayscale&quot;. Defaults to &quot;grayscale&quot;.</span>
 <span class="sd">    </span>
 <span class="sd">    RAISES:</span>
 <span class="sd">      OSError: If any of ir_folder, rgb_folder or masks_folder do not exist.</span>
-<span class="sd">      ValueError: If subset is not either &#39;Train&#39; or &#39;Test&#39;.</span>
-<span class="sd">      ValueError: If image_color_mode and mask_color_mode are either &#39;rgb&#39; or &#39;grayscale&#39;.</span>
+<span class="sd">      ValueError: If subset is not either &quot;Train&quot; or &quot;Test&quot;.</span>
+<span class="sd">      ValueError: If image_color_mode and mask_color_mode are either &quot;rgb&quot; or &quot;grayscale&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">transforms</span><span class="p">)</span>
 
@@ -831,32 +831,13 @@ Subset of 4 ground truth segmentation masks marked for Train.
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;ir_path&quot;</span><span class="p">]))</span>
-<span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
-<span class="n">mask</span> <span class="o">=</span> <span class="n">createRoughRiverMask</span><span class="p">(</span><span class="n">datapoint</span><span class="p">)</span>
-<span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span> <span class="o">=</span> <span class="n">generateInputPointsFromMask</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-<span class="n">show_points</span><span class="p">(</span><span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">())</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;on&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/masking_12_0.png" src="../_images/masking_12_0.png" />
-</div>
-</div>
-<p>Facebook’s SAM provides 3 model sizes. For our purposes the smallest of the three, ViT-B, will suffice. The model checkpoint can be downloaded from <a class="reference external" href="https://github.com/facebookresearch/segment-anything#model-checkpoints">this</a> link.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">segment_anything</span> <span class="kn">import</span> <span class="n">sam_model_registry</span><span class="p">,</span> <span class="n">SamPredictor</span>
 
-<span class="n">sam_checkpoint</span> <span class="o">=</span> <span class="s2">&quot;../data/model/sam_vit_b_01ec64.pth&quot;</span>
-<span class="n">model_type</span> <span class="o">=</span> <span class="s2">&quot;vit_b&quot;</span>
+<span class="c1"># sam_checkpoint = &quot;../data/model/sam_vit_b_01ec64.pth&quot;</span>
+<span class="n">sam_checkpoint</span> <span class="o">=</span> <span class="s2">&quot;../data/model/sam_vit_h_4b8939.pth&quot;</span>
+<span class="n">model_type</span> <span class="o">=</span> <span class="s2">&quot;vit_h&quot;</span>
 
 <span class="c1"># device = &quot;cuda&quot;</span>
 <span class="n">device</span> <span class="o">=</span> <span class="kc">None</span>
@@ -871,11 +852,31 @@ Subset of 4 ground truth segmentation masks marked for Train.
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predictor</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;ir_path&quot;</span><span class="p">]))</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+<span class="n">predictor</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mask</span> <span class="o">=</span> <span class="n">createRoughRiverMask</span><span class="p">(</span><span class="n">datapoint</span><span class="p">)</span>
+<span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span> <span class="o">=</span> <span class="n">generateInputPointsFromMask</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="n">show_points</span><span class="p">(</span><span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;on&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/masking_14_0.png" src="../_images/masking_14_0.png" />
+</div>
+</div>
+<p>Facebook’s SAM provides 3 model sizes. For our purposes the smallest of the three, ViT-B, will suffice. The model checkpoint can be downloaded from <a class="reference external" href="https://github.com/facebookresearch/segment-anything#model-checkpoints">this</a> link.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">masks</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">logits</span> <span class="o">=</span> <span class="n">predictor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
@@ -895,7 +896,7 @@ Subset of 4 ground truth segmentation masks marked for Train.
   <span class="n">show_mask</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">())</span>
   <span class="n">show_points</span><span class="p">(</span><span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">())</span>
   <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mask </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">, Score: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
-  <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
   <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  
 </pre></div>
 </div>
