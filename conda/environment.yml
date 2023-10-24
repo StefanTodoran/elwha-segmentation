@@ -22,6 +22,7 @@ dependencies:
   - nomkl 
 
   - pip:
+    - segment-geospatial
     - opencv-python-headless
     - stitching
     - torch
