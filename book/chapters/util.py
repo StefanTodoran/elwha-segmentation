@@ -1,4 +1,18 @@
 import numpy as np
+import os.path
+
+def initializeFolders():
+  folders = [
+    "../data/img/",
+    "../out/",
+    "../out/intermediate/",
+    "../out/realignment/",
+    "../out/segmentation/",
+  ]
+
+  for folder in folders:
+    if not os.path.exists(folder):
+      os.makedirs(folder)
 
 def getSavePath(type, number) -> str:
   if (type == "RGB"):
