@@ -1,4 +1,18 @@
 import numpy as np
+import os.path
+
+def initializeFolders():
+  folders = [
+    "../data/img/",
+    "../out/",
+    "../out/intermediate/",
+    "../out/realignment/",
+    "../out/geotiff/",
+  ]
+
+  for folder in folders:
+    if not os.path.exists(folder):
+      os.makedirs(folder)
 
 def getSavePath(type, number) -> str:
   if (type == "RGB"):
@@ -15,6 +29,11 @@ def getSavePath(type, number) -> str:
   if (type == "MASK"):
     return f"../out/intermediate/mask_{number + 1}.png"
 
+  if (type == "GEOTIFF"):
+    return f"../out/geotiff/tiff_{number}.tiff"
+  if (type == "GEOSAM"):
+    return f"../out/geotiff/predict_{number}.tiff"
+  
   if (type == "FINAL"):
     return f"../out/realignment/rgb_{number + 1}.png"
   else:
