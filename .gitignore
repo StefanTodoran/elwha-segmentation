@@ -1,6 +1,6 @@
 # Ignore the massive dataset
 book/data/AirborneData.mat
-book/out
+book/out/
 book/data/img
 book/data/model
 .DS_Store

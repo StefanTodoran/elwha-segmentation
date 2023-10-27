@@ -7,7 +7,7 @@ def initializeFolders():
     "../out/",
     "../out/intermediate/",
     "../out/realignment/",
-    "../out/segmentation/",
+    "../out/geotiff/",
   ]
 
   for folder in folders:
@@ -29,6 +29,11 @@ def getSavePath(type, number) -> str:
   if (type == "MASK"):
     return f"../out/intermediate/mask_{number + 1}.png"
 
+  if (type == "GEOTIFF"):
+    return f"../out/geotiff/tiff_{number}.tiff"
+  if (type == "GEOSAM"):
+    return f"../out/geotiff/predict_{number}.tiff"
+  
   if (type == "FINAL"):
     return f"../out/realignment/rgb_{number + 1}.png"
   else:

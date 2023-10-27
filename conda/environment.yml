@@ -16,12 +16,14 @@ dependencies:
   - scipy
   - pillow
   - matplotlib
+  - gdal
 
   # Install should be through conda forge, if matplotlib is crashing
   # the kernel, try running `conda install nomkl --channel conda-forge`
   - nomkl 
 
   - pip:
+    - scikit-image
     - pyproj
     - segment-geospatial
     - opencv-python-headless
