@@ -25,6 +25,7 @@ airborne_data_path = "../data/AirborneData.mat"
 # airborne_data_path = "../data/AirborneDataMini.mat"
 
 assert os.path.exists(airborne_data_path)
+util.initializeFolders()
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
@@ -36,6 +37,7 @@ Cell [0;32mIn [3], line 8[0m
 [1;32m      5[0m [38;5;66;03m# For just using the mini dataset locally:[39;00m
 [1;32m      6[0m [38;5;66;03m# airborne_data_path = "../data/AirborneDataMini.mat"[39;00m
 [0;32m----> 8[0m [38;5;28;01massert[39;00m os[38;5;241m.[39mpath[38;5;241m.[39mexists(airborne_data_path)
+[1;32m      9[0m util[38;5;241m.[39minitializeFolders()
 
 [0;31mAssertionError[0m: 
 AssertionError: 

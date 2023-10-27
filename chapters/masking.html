@@ -414,6 +414,11 @@ title="Print to PDF"
    Introduction
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#dataset">
+   Dataset
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -438,6 +443,11 @@ title="Print to PDF"
    Introduction
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#dataset">
+   Dataset
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -452,21 +462,23 @@ title="Print to PDF"
 <h1>River Boundary Masking<a class="headerlink" href="#river-boundary-masking" title="Permalink to this headline">#</a></h1>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">#</a></h2>
-<p>Plan:</p>
+<p>Cold water refuges are crucial havens for fish species, offering them sanctuary and relief. These refuges are specific areas within aquatic ecosystems, such as deep pools or shaded sections, where the water remains relatively colder than the surrounding environment. With the increasing impact of climate change and its associated rising temperatures, cold water refuges serve as essential habitats for fish, providing them with a reprieve from stressful conditions and enabling their survival and reproductive success. By seeking out these refuges, fish can maintain optimal physiological functioning, evade thermal stress, and ensure the long-term sustainability of their populations.</p>
+<p>In this section, we will use our realign dataset to create river masks for our IR images. These masks will then be used to identify cold water refuges in the river in the next section. The segmentation model selected for use is Meta’s SAM. The workflow overview of how it is utilized to create river masks is as follows:</p>
 <ul class="simple">
-<li><p>Stitch together RGB images with openCV sticher (done)</p></li>
-<li><p>Find best descriptor for colorspace invariance (done)</p></li>
-<li><p>Slice them according to IR images (done)</p></li>
-<li><p>Create training data by hand, start using exiting river masks</p></li>
-<li><p>Split dataset into training, testing and validation</p></li>
-<li><p>Use pre-trained classification model with final layer removed for transfer learning</p></li>
-<li><p>Train it on training dataset and evaluate performance</p></li>
+<li><p>Create a small training dataset by hand using <a class="reference external" href="http://paint.net">paint.net</a></p></li>
+<li><p>Split said dataset into training, testing and validation</p></li>
+<li><p>Create mechanism for creating point prompts for SAM</p></li>
+<li><p>Fine tune SAM via transfer learning on the training data</p></li>
+<li><p>Evaluate model performance and generate masks</p></li>
 </ul>
-<p>Note to self:
-ir_image_{x} matches with cropped_{x-1} and with truth_{x}</p>
-<p>The first step is to build our ground truth dataset. It seems that the original processing done in 2012 included some preliminary river masks. Unfortunately, these masks are fairly poor. They also do not help with the construction of our ground truth dataset; it is easier to just manually create label images using the fill tool in <a class="reference external" href="http://paint.net">paint.net</a> using RGB images layered with transparency over the IR images.</p>
-<p>Reflectance of water is lower than soil and vegetation across a wide range of the electromagnetic spectrum, including within the visible RGB portion, but it is significantly lower in the IR range. This means that while both the RGB and IR remote sensing imagery will prove relevant to the model, the IR images will be the key to accurate segmentation.</p>
+</section>
+<section id="dataset">
+<h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">#</a></h2>
+<p>The first step is to build our ground truth dataset. It seems that the original processing done in 2012 included some preliminary river masks. Unfortunately, these masks are fairly poor. They also do not help with the construction of our ground truth dataset; it is easier to just manually create new masks than it is to patch up the existing masks.</p>
+<p>The process of creating ground truth masks involves using the magic wand tool in <a class="reference external" href="http://paint.net">paint.net</a>, which selects an contiguous area of similar color based on some tolerance value. Then this area is filled with black and the rest of the image with white, and the mask can then be manually adjusted to match the river in areas where the magic wand fails to align perfectly with the river edge.</p>
+<p>The optimal results are achieved by using RGB images layered with transparency over the IR images, as the IR images have the highest contrast between river and non-river pixels. This is because reflectance of water is lower than soil and vegetation across a wide range of the electromagnetic spectrum, including within the visible RGB portion, but the difference is most significant in the IR range.</p>
 <p><img alt="Quadrant Filtering" src="../_images/reflectance.png" /></p>
+<p>The difference in reflectance then results in the contrast between the river and land pixels being larger in the IR images. This also means that while both the RGB and IR remote sensing imagery may prove relevant to the model, the IR images will be the key to accurate segmentation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import os</span>
@@ -477,24 +489,30 @@ ir_image_{x} matches with cropped_{x-1} and with truth_{x}</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">util</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">util</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span> <span class="k">as</span> <span class="n">im</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
 
+<span class="c1"># System and typing</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span> <span class="k">as</span> <span class="n">im</span>
-<span class="kn">import</span> <span class="nn">cv2</span>
 
+<span class="c1"># Finding central points</span>
+<span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">erosion</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
 <span class="kn">from</span> <span class="nn">torchvision.datasets.vision</span> <span class="kn">import</span> <span class="n">VisionDataset</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="c1"># from torchvision import transforms</span>
 </pre></div>
 </div>
 </div>
 </div>
+<p>Now that we have our ground truth masks, we need a PyTorch datastructure through which we can use them. We will extend the VisionDataset class, creating our own SegmentationDataset class which has support for transforms. This will come in handy later when we do dataset augmentation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
@@ -649,6 +667,7 @@ ir_image_{x} matches with cropped_{x-1} and with truth_{x}</p>
 </div>
 </div>
 </div>
+<p>The custom dataset class is used as follows.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ir_folder</span> <span class="o">=</span> <span class="s2">&quot;data/img/&quot;</span>
@@ -657,7 +676,7 @@ ir_image_{x} matches with cropped_{x-1} and with truth_{x}</p>
 <span class="n">rgb_folder</span> <span class="o">=</span> <span class="s2">&quot;out/realignment/&quot;</span>
 <span class="n">rgb_prefix</span> <span class="o">=</span> <span class="s2">&quot;rgb_&quot;</span>
 
-<span class="n">truth_folder</span> <span class="o">=</span> <span class="s2">&quot;out/segmentation/&quot;</span>
+<span class="n">truth_folder</span> <span class="o">=</span> <span class="s2">&quot;truth/&quot;</span>
 <span class="n">truth_prefix</span> <span class="o">=</span> <span class="s2">&quot;truth_&quot;</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">SegmentationDataset</span><span class="p">(</span>
@@ -669,34 +688,55 @@ ir_image_{x} matches with cropped_{x-1} and with truth_{x}</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Found and loaded 5 ground truth segmentation masks.
-Subset of 4 ground truth segmentation masks marked for Train.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Found and loaded 8 ground truth segmentation masks.
+Subset of 6 ground truth segmentation masks marked for Train.
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sample_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="n">datapoint</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">]</span> <span class="c1"># type: ignore</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">datapoint_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
+  <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+  <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Datapoint:&quot;</span>
+<span class="p">)</span>
 
-<span class="n">display</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;ir&quot;</span><span class="p">])</span>
-<span class="n">display</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;rgb&quot;</span><span class="p">])</span>
-<span class="n">display</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">updateDatapoint</span><span class="p">(</span><span class="n">interpolation</span><span class="p">):</span>
+  <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">interpolation</span><span class="p">)</span>
+  <span class="n">datapoint</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+  <span class="n">figure</span><span class="p">,</span> <span class="p">(</span><span class="n">rgb_ax</span><span class="p">,</span> <span class="n">ir_ax</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+  <span class="n">rgb_ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;ir&quot;</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;hot&quot;</span><span class="p">)</span>
+  <span class="n">ir_ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;rgb&quot;</span><span class="p">])</span>
+
+<span class="c1"># sample_idx = torch.randint(len(data), size=(1,)).item()</span>
+<span class="c1"># datapoint = data[sample_idx] # type: ignore</span>
+
+<span class="n">data_preview</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">interactive</span><span class="p">(</span><span class="n">updateDatapoint</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">datapoint_slider</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">data_preview</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/masking_7_0.png" src="../_images/masking_7_0.png" />
-<img alt="../_images/masking_7_1.png" src="../_images/masking_7_1.png" />
-<img alt="../_images/masking_7_2.png" src="../_images/masking_7_2.png" />
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "420f75419e624b44a8ad30c83989afd1", "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+<p>Set the <code class="docutils literal notranslate"><span class="pre">datapoint</span></code> variable to the data point selected above.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">datapoint</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">datapoint_slider</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+<span class="n">rgb_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;rgb_path&quot;</span><span class="p">]))</span>
+<span class="n">ir_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;ir_path&quot;</span><span class="p">]),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">createRoughMaskFromIR</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
   <span class="n">_</span><span class="p">,</span> <span class="n">binary_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">threshold</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">THRESH_BINARY</span><span class="p">)</span>
-  <span class="k">return</span> <span class="n">binary_image</span>
+  <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">bitwise_not</span><span class="p">(</span><span class="n">binary_image</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">createRoughMaskFromHSVBounds</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">lower_blue</span><span class="p">,</span> <span class="n">upper_blue</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;</span>
@@ -723,6 +763,8 @@ Subset of 4 ground truth segmentation masks marked for Train.
 
   <span class="n">blank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span> <span class="c1"># create a blank white image of the same size as the original image</span>
   <span class="n">result</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">blank</span><span class="p">,</span> <span class="n">blank</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">blue_mask</span><span class="p">)</span> <span class="c1"># set blue pixels in the white image to black</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">bitwise_not</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+  
   <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">findMaskIntersection</span><span class="p">(</span><span class="n">mask1</span><span class="p">,</span> <span class="n">mask2</span><span class="p">):</span>
@@ -739,32 +781,98 @@ Subset of 4 ground truth segmentation masks marked for Train.
 
   <span class="k">return</span> <span class="n">intersection</span>
 
-<span class="k">def</span> <span class="nf">createRoughRiverMask</span><span class="p">(</span><span class="n">datapoint</span><span class="p">):</span>
-  <span class="n">rgb_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;rgb_path&quot;</span><span class="p">]))</span>
-  <span class="n">ir_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;ir_path&quot;</span><span class="p">]),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
-
-  <span class="n">mask1</span> <span class="o">=</span> <span class="n">createRoughMaskFromHSVBounds</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">,</span> <span class="p">[</span><span class="mi">75</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="p">[</span><span class="mi">140</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">230</span><span class="p">])</span>
-  <span class="n">mask2</span> <span class="o">=</span> <span class="n">createRoughMaskFromIR</span><span class="p">(</span><span class="n">ir_image</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-  <span class="n">mask</span> <span class="o">=</span> <span class="n">findMaskIntersection</span><span class="p">(</span><span class="n">mask1</span><span class="p">,</span> <span class="n">mask2</span><span class="p">)</span>
-
-  <span class="k">return</span> <span class="n">mask</span>
+<span class="k">def</span> <span class="nf">createRoughRiverMask</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">,</span> <span class="n">ir_image</span><span class="p">,</span> <span class="n">low_blue</span><span class="p">,</span> <span class="n">high_blue</span><span class="p">,</span> <span class="n">max_temp</span><span class="p">,</span> <span class="n">return_components</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+  <span class="n">mask1</span> <span class="o">=</span> <span class="n">createRoughMaskFromHSVBounds</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">,</span> <span class="n">low_blue</span><span class="p">,</span> <span class="n">high_blue</span><span class="p">)</span>
+  <span class="n">mask2</span> <span class="o">=</span> <span class="n">createRoughMaskFromIR</span><span class="p">(</span><span class="n">ir_image</span><span class="p">,</span> <span class="n">max_temp</span><span class="p">)</span>
+  
+  <span class="k">if</span> <span class="n">return_components</span><span class="p">:</span> <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">mask1</span><span class="p">,</span> <span class="n">mask2</span><span class="p">),</span> <span class="n">mask1</span><span class="p">,</span> <span class="n">mask2</span>
+  <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">mask1</span><span class="p">,</span> <span class="n">mask2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mask</span> <span class="o">=</span> <span class="n">createRoughRiverMask</span><span class="p">(</span><span class="n">datapoint</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hue_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntRangeSlider</span><span class="p">(</span>
+  <span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="mi">75</span><span class="p">,</span> <span class="mi">140</span><span class="p">],</span>
+  <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">179</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+  <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Hue:&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">sat_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntRangeSlider</span><span class="p">(</span>
+  <span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span>
+  <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+  <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Saturation:&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">val_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntRangeSlider</span><span class="p">(</span>
+  <span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">230</span><span class="p">],</span>
+  <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+  <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Value:&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">temp_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
+  <span class="n">value</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+  <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+  <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Max Temperature:&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 
+<span class="k">def</span> <span class="nf">updateRoughMasks</span><span class="p">(</span><span class="n">hue_range</span><span class="p">,</span> <span class="n">sat_range</span><span class="p">,</span> <span class="n">val_range</span><span class="p">,</span> <span class="n">max_temp</span><span class="p">):</span>
+  <span class="n">low_blue</span> <span class="o">=</span> <span class="p">[</span><span class="n">hue_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sat_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">val_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+  <span class="n">high_blue</span> <span class="o">=</span> <span class="p">[</span><span class="n">hue_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sat_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">val_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+  <span class="n">hsv_mask</span> <span class="o">=</span> <span class="n">createRoughMaskFromHSVBounds</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">,</span> <span class="n">low_blue</span><span class="p">,</span> <span class="n">high_blue</span><span class="p">)</span>
+  <span class="n">temp_mask</span> <span class="o">=</span> <span class="n">createRoughMaskFromIR</span><span class="p">(</span><span class="n">ir_image</span><span class="p">,</span> <span class="n">max_temp</span><span class="p">)</span>
+  <span class="n">result_mask</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">hsv_mask</span><span class="p">,</span> <span class="n">temp_mask</span><span class="p">)</span>
+
+  <span class="n">masks</span> <span class="o">=</span> <span class="p">[</span><span class="n">hsv_mask</span><span class="p">,</span> <span class="n">temp_mask</span><span class="p">,</span> <span class="n">result_mask</span><span class="p">]</span>
+  <span class="n">figure</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">masks</span><span class="p">))</span>
+
+  <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">masks</span><span class="p">):</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+  <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">interactive_plot</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">interactive</span><span class="p">(</span>
+  <span class="n">updateRoughMasks</span><span class="p">,</span> 
+  <span class="n">hue_range</span><span class="o">=</span><span class="n">hue_slider</span><span class="p">,</span>
+  <span class="n">sat_range</span><span class="o">=</span><span class="n">sat_slider</span><span class="p">,</span>
+  <span class="n">val_range</span><span class="o">=</span><span class="n">val_slider</span><span class="p">,</span>
+  <span class="n">max_temp</span><span class="o">=</span><span class="n">temp_slider</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">interactive_plot</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "979c2da43716449dbc13458c79952fba", "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">getRoughRiverMask</span><span class="p">(</span><span class="n">datapoint</span><span class="p">,</span> <span class="n">do_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">return_components</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+  <span class="n">rgb_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;rgb_path&quot;</span><span class="p">]))</span>
+  <span class="n">ir_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;ir_path&quot;</span><span class="p">]),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
+
+  <span class="n">low_blue</span> <span class="o">=</span> <span class="p">[</span><span class="n">hue_slider</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sat_slider</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">val_slider</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="c1"># [75, 10, 20]</span>
+  <span class="n">high_blue</span> <span class="o">=</span> <span class="p">[</span><span class="n">hue_slider</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sat_slider</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">val_slider</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="c1"># [140, 200, 230]</span>
+
+  <span class="k">if</span> <span class="n">do_print</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating mask via HSV thresholding...</span><span class="se">\n</span><span class="s2">Bounds:&quot;</span><span class="p">,</span> <span class="n">low_blue</span><span class="p">,</span> <span class="n">high_blue</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">createRoughRiverMask</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">,</span> <span class="n">ir_image</span><span class="p">,</span> <span class="n">low_blue</span><span class="p">,</span> <span class="n">high_blue</span><span class="p">,</span> <span class="n">temp_slider</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">return_components</span><span class="p">)</span>
+
+<span class="n">mask</span> <span class="o">=</span> <span class="n">getRoughRiverMask</span><span class="p">(</span><span class="n">datapoint</span><span class="p">,</span> <span class="n">do_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">bitwise_not</span><span class="p">(</span><span class="n">mask</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;on&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/masking_9_0.png" src="../_images/masking_9_0.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Creating mask via HSV thresholding...
+Bounds: [75, 10, 20] [140, 200, 230]
+</pre></div>
+</div>
+<img alt="../_images/masking_14_1.png" src="../_images/masking_14_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -799,32 +907,98 @@ Subset of 4 ground truth segmentation masks marked for Train.
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generateInputPointsFromMask</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
-  <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">controlPointsFromMask</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+  <span class="n">input_points</span> <span class="o">=</span> <span class="p">[]</span>
+
+  <span class="k">def</span> <span class="nf">euclideanDistance</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+  <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_points</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">number</span><span class="p">:</span>
+    <span class="n">zero_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">mask</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">positive</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">zero_indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+      <span class="n">found_valid</span> <span class="o">=</span> <span class="kc">False</span>
+      <span class="k">while</span> <span class="ow">not</span> <span class="n">found_valid</span><span class="p">:</span>
+        <span class="n">random_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">zero_indices</span><span class="p">))</span>
+        <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">zero_indices</span><span class="p">[</span><span class="n">random_index</span><span class="p">]</span>
+        <span class="n">new_point</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span><span class="p">,</span> <span class="n">row</span><span class="p">]</span>
+        
+        <span class="c1"># Check if the new point is far enough from existing points</span>
+        <span class="n">too_close</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">input_points</span><span class="p">:</span>
+          <span class="k">if</span> <span class="n">euclideanDistance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">new_point</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">distance</span><span class="p">:</span>
+            <span class="n">too_close</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">too_close</span><span class="p">:</span>
+          <span class="n">input_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_point</span><span class="p">)</span>
+          <span class="n">found_valid</span> <span class="o">=</span> <span class="kc">True</span>
+          <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">zero_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">zero_indices</span><span class="p">,</span> <span class="n">random_index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+          <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">zero_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">break</span>
+      <span class="c1"># end while</span>
+
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">found_valid</span><span class="p">:</span> <span class="c1"># There are points left but none with enough distance between them.</span>
+        <span class="k">break</span>
+    
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">break</span>  <span class="c1"># We have fewer than &quot;number&quot; points, but there are no valid points left.</span>
+
+  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">input_points</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">generateInputPointsFromMask</span><span class="p">(</span>
+  <span class="n">number</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+  <span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+  <span class="n">minDistance</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="n">negativeSrcMask</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+  <span class="n">numNegative</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+  <span class="n">positiveSrcMask</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+  <span class="n">numPositive</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
   <span class="n">input_points</span> <span class="o">=</span> <span class="p">[]</span>
   <span class="n">input_labels</span> <span class="o">=</span> <span class="p">[]</span>
 
-  <span class="n">num_positive</span> <span class="o">=</span> <span class="mi">0</span>
-  <span class="n">num_negative</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="n">_numNegative</span> <span class="o">=</span> <span class="n">numNegative</span> <span class="k">if</span> <span class="n">numNegative</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">number</span>
+  <span class="k">if</span> <span class="n">_numNegative</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">control_points</span> <span class="o">=</span> <span class="n">controlPointsFromMask</span><span class="p">(</span>
+      <span class="n">negativeSrcMask</span> <span class="k">if</span> <span class="n">negativeSrcMask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">mask</span><span class="p">,</span>
+      <span class="n">_numNegative</span><span class="p">,</span>
+      <span class="n">distance</span><span class="o">=</span><span class="n">minDistance</span>
+    <span class="p">)</span>
+    <span class="n">input_points</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">control_points</span><span class="p">)</span>
+    <span class="n">input_labels</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">control_points</span><span class="p">))</span>
 
-  <span class="k">while</span> <span class="n">num_positive</span> <span class="o">&lt;</span> <span class="n">N</span> <span class="ow">or</span> <span class="n">num_negative</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">:</span>
-    <span class="c1"># Generate random (x, y) coordinates within the image dimensions</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">mask</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">num_positive</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">:</span>
-      <span class="n">input_points</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
-      <span class="n">input_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-      <span class="n">num_positive</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="k">if</span> <span class="n">mask</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">num_negative</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">:</span>
-      <span class="n">input_points</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
-      <span class="n">input_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-      <span class="n">num_negative</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="n">_numPositive</span> <span class="o">=</span> <span class="n">numPositive</span> <span class="k">if</span> <span class="n">numPositive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">number</span>
+  <span class="k">if</span> <span class="n">_numPositive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">control_points</span> <span class="o">=</span> <span class="n">controlPointsFromMask</span><span class="p">(</span>
+      <span class="n">positiveSrcMask</span> <span class="k">if</span> <span class="n">positiveSrcMask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">mask</span><span class="p">,</span>
+      <span class="n">_numPositive</span><span class="p">,</span>
+      <span class="n">distance</span><span class="o">=</span><span class="n">minDistance</span><span class="p">,</span>
+      <span class="n">positive</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">input_points</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">control_points</span><span class="p">)</span>
+    <span class="n">input_labels</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">control_points</span><span class="p">))</span>
 
   <span class="n">input_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">input_points</span><span class="p">)</span>
   <span class="n">input_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">input_labels</span><span class="p">)</span>
 
   <span class="k">return</span> <span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span>
+
+<span class="n">square</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+  <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+<span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">multiErode</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">square</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">erosion</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">im</span>
 </pre></div>
 </div>
 </div>
@@ -835,7 +1009,7 @@ Subset of 4 ground truth segmentation masks marked for Train.
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">segment_anything</span> <span class="kn">import</span> <span class="n">sam_model_registry</span><span class="p">,</span> <span class="n">SamPredictor</span>
 
-<span class="c1"># sam_checkpoint = &quot;../data/model/sam_vit_b_01ec64.pth&quot;</span>
+<span class="c1"># TODO: fetch model if it isn&#39;t downloaded</span>
 <span class="n">sam_checkpoint</span> <span class="o">=</span> <span class="s2">&quot;../data/model/sam_vit_h_4b8939.pth&quot;</span>
 <span class="n">model_type</span> <span class="o">=</span> <span class="s2">&quot;vit_h&quot;</span>
 
@@ -854,35 +1028,115 @@ Subset of 4 ground truth segmentation masks marked for Train.
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;ir_path&quot;</span><span class="p">]))</span>
 <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
-<span class="n">predictor</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mask</span> <span class="o">=</span> <span class="n">createRoughRiverMask</span><span class="p">(</span><span class="n">datapoint</span><span class="p">)</span>
-<span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span> <span class="o">=</span> <span class="n">generateInputPointsFromMask</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="n">mask</span> <span class="o">=</span> <span class="n">getRoughRiverMask</span><span class="p">(</span><span class="n">datapoint</span><span class="p">)</span>
+<span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span> <span class="o">=</span> <span class="n">generateInputPointsFromMask</span><span class="p">(</span><span class="n">number</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 <span class="n">show_points</span><span class="p">(</span><span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">())</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;on&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/masking_14_0.png" src="../_images/masking_14_0.png" />
+<img alt="../_images/masking_18_0.png" src="../_images/masking_18_0.png" />
 </div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">erode_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
+  <span class="n">value</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+  <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+  <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Erosion Factor:&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">distance_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
+  <span class="n">value</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+  <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+  <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Min Distance:&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">points_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
+  <span class="n">value</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+  <span class="nb">min</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+  <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Control Points:&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">getControlPoints</span><span class="p">(</span>
+  <span class="n">num_points</span> <span class="o">=</span> <span class="n">points_slider</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> 
+  <span class="n">erosion_factor</span> <span class="o">=</span> <span class="n">erode_slider</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> 
+  <span class="n">min_distance</span> <span class="o">=</span> <span class="n">distance_slider</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> 
+  <span class="n">give_erosion_mask</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">):</span>
+  <span class="n">mask</span> <span class="o">=</span> <span class="n">getRoughRiverMask</span><span class="p">(</span><span class="n">datapoint</span><span class="p">)</span>
+  <span class="n">binarized</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&gt;</span> <span class="mi">1</span>
+  <span class="n">eroded</span> <span class="o">=</span> <span class="n">multiErode</span><span class="p">(</span><span class="n">binarized</span><span class="p">,</span> <span class="n">erosion_factor</span><span class="p">)</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="n">generateInputPointsFromMask</span><span class="p">(</span><span class="n">numPositive</span><span class="o">=</span><span class="n">num_points</span><span class="p">,</span> <span class="n">positiveSrcMask</span><span class="o">=</span><span class="n">eroded</span><span class="p">,</span> <span class="n">minDistance</span><span class="o">=</span><span class="n">min_distance</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">give_erosion_mask</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">eroded</span><span class="p">,</span> <span class="n">result</span>
+  <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">updateControlPoints</span><span class="p">(</span><span class="n">erosion_factor</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="n">min_distance</span><span class="p">,</span> <span class="n">force_refresh</span><span class="p">):</span>
+  <span class="n">eroded</span><span class="p">,</span> <span class="p">(</span><span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span><span class="p">)</span> <span class="o">=</span> <span class="n">getControlPoints</span><span class="p">(</span><span class="n">num_points</span><span class="p">,</span> <span class="n">erosion_factor</span><span class="p">,</span> <span class="n">min_distance</span><span class="p">,</span> <span class="n">give_erosion_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">figure</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+
+  <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">eroded</span><span class="p">)</span>
+  <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+  <span class="n">show_points</span><span class="p">(</span><span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span><span class="p">,</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+  <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">randomize_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">ToggleButton</span><span class="p">(</span>
+  <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+  <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Generate&quot;</span><span class="p">,</span>
+  <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">interactive_plot</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">interactive</span><span class="p">(</span>
+  <span class="n">updateControlPoints</span><span class="p">,</span> 
+  <span class="n">erosion_factor</span><span class="o">=</span><span class="n">erode_slider</span><span class="p">,</span>
+  <span class="n">num_points</span><span class="o">=</span><span class="n">points_slider</span><span class="p">,</span>
+  <span class="n">min_distance</span><span class="o">=</span><span class="n">distance_slider</span><span class="p">,</span>
+  <span class="n">force_refresh</span><span class="o">=</span><span class="n">randomize_button</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">interactive_plot</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "27c588d05bb14ec3aceebd6b0e445a3f", "version_major": 2, "version_minor": 0}
+</script></div>
 </div>
 <p>Facebook’s SAM provides 3 model sizes. For our purposes the smallest of the three, ViT-B, will suffice. The model checkpoint can be downloaded from <a class="reference external" href="https://github.com/facebookresearch/segment-anything#model-checkpoints">this</a> link.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span> <span class="o">=</span> <span class="n">getControlPoints</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="n">show_points</span><span class="p">(</span><span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/masking_21_0.png" src="../_images/masking_21_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predictor</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">masks</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">logits</span> <span class="o">=</span> <span class="n">predictor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
   <span class="n">point_coords</span><span class="o">=</span><span class="n">input_points</span><span class="p">,</span>
   <span class="n">point_labels</span><span class="o">=</span><span class="n">input_labels</span><span class="p">,</span>
-  <span class="n">multimask_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+  <span class="n">multimask_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -902,11 +1156,226 @@ Subset of 4 ground truth segmentation masks marked for Train.
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/masking_17_0.png" src="../_images/masking_17_0.png" />
-<img alt="../_images/masking_17_1.png" src="../_images/masking_17_1.png" />
-<img alt="../_images/masking_17_2.png" src="../_images/masking_17_2.png" />
+<img alt="../_images/masking_24_0.png" src="../_images/masking_24_0.png" />
 </div>
 </div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluateMaskAccuracy</span><span class="p">(</span><span class="n">datapoint</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">control_points</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">best_values</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+  <span class="n">best_input_points</span> <span class="o">=</span> <span class="n">best_input_labels</span> <span class="o">=</span> <span class="n">best_index</span> <span class="o">=</span> <span class="n">best_score</span> <span class="o">=</span> <span class="n">all_scores</span> <span class="o">=</span> <span class="n">best_erosion</span> <span class="o">=</span> <span class="kc">None</span>
+  <span class="k">if</span> <span class="n">control_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">best_input_points</span><span class="p">,</span> <span class="n">best_input_labels</span> <span class="o">=</span> <span class="n">control_points</span>
+  <span class="k">if</span> <span class="n">best_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">best_index</span><span class="p">,</span> <span class="n">best_score</span><span class="p">,</span> <span class="n">all_scores</span><span class="p">,</span> <span class="n">best_erosion</span> <span class="o">=</span> <span class="n">best_values</span>
+
+  <span class="n">rgb_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;rgb_path&quot;</span><span class="p">]))</span>
+  <span class="n">rgb_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+  
+  <span class="n">truth</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;mask_path&quot;</span><span class="p">]))</span>
+  <span class="n">truth</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">bitwise_not</span><span class="p">(</span><span class="n">truth</span><span class="p">)[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+  <span class="n">prediction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="n">error</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">bitwise_xor</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">truth</span><span class="p">)</span>
+
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Misclasified pixels:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total river pixels:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">truth</span><span class="p">))</span>
+  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error rate: </span><span class="si">{</span><span class="mi">100</span> <span class="o">*</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">truth</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+
+  <span class="c1"># print(f&quot;Error rate: {100 * round(np.count_nonzero(error) / (prediction.shape[0] * prediction.shape[1]), 4)}%&quot;)</span>
+
+  <span class="n">plot_images</span> <span class="o">=</span> <span class="p">[</span><span class="n">rgb_image</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">truth</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+  <span class="n">figure</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">plot_images</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">))</span>
+
+  <span class="k">if</span> <span class="n">control_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">show_mask</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">show_points</span><span class="p">(</span><span class="n">best_input_points</span><span class="p">,</span> <span class="n">best_input_labels</span><span class="p">,</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+  <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plot_images</span><span class="p">):</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">best_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">plot_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Mask </span><span class="si">{</span><span class="n">best_index</span><span class="si">}</span><span class="s2"> (Score: </span><span class="si">{</span><span class="n">best_score</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="k">if</span> <span class="n">best_erosion</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">plot_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Mask </span><span class="si">{</span><span class="n">best_index</span><span class="si">}</span><span class="s2"> (Erosion: </span><span class="si">{</span><span class="n">best_erosion</span><span class="si">}</span><span class="s2">, Score: </span><span class="si">{</span><span class="n">best_score</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">plot_title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimum Score: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">all_scores</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Median Score: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">all_scores</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean Score: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">all_scores</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+  <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">evaluateMaskAccuracy</span><span class="p">(</span><span class="n">datapoint</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Misclasified pixels: 5374
+Total river pixels: 17676
+Error rate: 30.4%
+</pre></div>
+</div>
+<img alt="../_images/masking_26_2.png" src="../_images/masking_26_2.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">bestOfMultiRoundPrediction</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">num_rounds</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">erosion_range</span><span class="p">:</span> <span class="nb">range</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+  <span class="c1"># print(&quot;Setting predictor image...&quot;, end=&quot;\r&quot;)</span>
+  <span class="n">predictor</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+  <span class="n">all_scores</span> <span class="o">=</span> <span class="p">[]</span>
+
+  <span class="n">best_index</span><span class="p">,</span> <span class="n">best_mask</span><span class="p">,</span> <span class="n">best_score</span><span class="p">,</span> <span class="n">best_erosion</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+  <span class="n">best_input_points</span><span class="p">,</span> <span class="n">best_input_labels</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+  <span class="n">_erosion_range</span> <span class="o">=</span> <span class="n">erosion_range</span> <span class="k">if</span> <span class="n">erosion_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+
+  <span class="k">for</span> <span class="n">erosion_val</span> <span class="ow">in</span> <span class="n">_erosion_range</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">):</span>
+      <span class="c1"># print(f&quot;Computing prediction round #{i} with erosion={erosion_val}&quot;, end=&quot;   \r&quot;)</span>
+      <span class="n">input_points</span><span class="p">,</span> <span class="n">input_labels</span> <span class="o">=</span> <span class="n">getControlPoints</span><span class="p">(</span><span class="n">erosion_factor</span><span class="o">=</span><span class="n">erosion_val</span><span class="p">)</span>
+
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_points</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">continue</span>
+      <span class="n">masks</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">_logits</span> <span class="o">=</span> <span class="n">predictor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+        <span class="n">point_coords</span><span class="o">=</span><span class="n">input_points</span><span class="p">,</span>
+        <span class="n">point_labels</span><span class="o">=</span><span class="n">input_labels</span><span class="p">,</span>
+        <span class="c1"># multimask_output=True,</span>
+        <span class="n">multimask_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+      <span class="p">)</span>
+      
+      <span class="n">all_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">best_score</span><span class="p">):</span>
+        <span class="n">best_index</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="n">best_score</span> <span class="o">=</span> <span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">best_mask</span> <span class="o">=</span> <span class="n">masks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">best_erosion</span> <span class="o">=</span> <span class="n">erosion_val</span>
+
+        <span class="n">best_input_points</span> <span class="o">=</span> <span class="n">input_points</span>
+        <span class="n">best_input_labels</span> <span class="o">=</span> <span class="n">input_labels</span>
+
+  <span class="k">return</span> <span class="n">best_mask</span><span class="p">,</span> <span class="p">(</span><span class="n">best_input_points</span><span class="p">,</span> <span class="n">best_input_labels</span><span class="p">),</span> <span class="p">(</span><span class="n">best_index</span><span class="p">,</span> <span class="n">best_score</span><span class="p">,</span> <span class="n">all_scores</span><span class="p">,</span> <span class="n">best_erosion</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+  <span class="n">datapoint</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">]</span>
+  <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datapoint</span><span class="p">[</span><span class="s2">&quot;ir_path&quot;</span><span class="p">]))</span>
+  <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+
+  <span class="n">best_mask</span><span class="p">,</span> <span class="n">control_points</span><span class="p">,</span> <span class="n">best_values</span> <span class="o">=</span> <span class="n">bestOfMultiRoundPrediction</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+  <span class="n">evaluateMaskAccuracy</span><span class="p">(</span><span class="n">datapoint</span><span class="p">,</span> <span class="n">best_mask</span><span class="p">,</span> <span class="n">control_points</span><span class="p">,</span> <span class="n">best_values</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Misclasified pixels: 649
+Total river pixels: 4958
+Error rate: 13.089999999999998%
+Minimum Score: 0.6977757215499878
+Median Score: 0.9661865830421448
+Mean Score: 0.9371496438980103
+</pre></div>
+</div>
+<img alt="../_images/masking_28_2.png" src="../_images/masking_28_2.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Misclasified pixels: 5220
+Total river pixels: 17676
+Error rate: 29.53%
+Minimum Score: 0.9239458441734314
+Median Score: 0.9483767747879028
+Mean Score: 0.9478647708892822
+</pre></div>
+</div>
+<img alt="../_images/masking_28_5.png" src="../_images/masking_28_5.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Misclasified pixels: 1234
+Total river pixels: 8032
+Error rate: 15.36%
+Minimum Score: 0.8378064036369324
+Median Score: 0.9529841542243958
+Mean Score: 0.945024847984314
+</pre></div>
+</div>
+<img alt="../_images/masking_28_8.png" src="../_images/masking_28_8.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Misclasified pixels: 8550
+Total river pixels: 14306
+Error rate: 59.77%
+Minimum Score: 0.8160128593444824
+Median Score: 0.8909616470336914
+Mean Score: 0.8871645927429199
+</pre></div>
+</div>
+<img alt="../_images/masking_28_11.png" src="../_images/masking_28_11.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Misclasified pixels: 290079
+Total river pixels: 12585
+Error rate: 2304.96%
+Minimum Score: 0.6994831562042236
+Median Score: 0.785735011100769
+Mean Score: 0.7816380262374878
+</pre></div>
+</div>
+<img alt="../_images/masking_28_14.png" src="../_images/masking_28_14.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Misclasified pixels: 137032
+Total river pixels: 11304
+Error rate: 1212.24%
+Minimum Score: 0.638766884803772
+Median Score: 0.8547325134277344
+Mean Score: 0.8219730257987976
+</pre></div>
+</div>
+<img alt="../_images/masking_28_17.png" src="../_images/masking_28_17.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># model = predictor.features</span>
+
+<span class="c1"># for param in model.parameters():</span>
+<span class="c1">#   param.requires_grad = False</span>
+
+<span class="c1"># num_features = model.fc.in_features</span>
+<span class="c1"># classifier = torch.nn.Linear(num_features, 2)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># for name, module in sam.named_modules():</span>
+<span class="c1">#   print(name, module)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>NOTE TO SELF:<br />
+ir_image_{x} matches with cropped_{x-1} and with truth_{x}
+ir images are degree in celsius</p>
 </section>
 </section>
 

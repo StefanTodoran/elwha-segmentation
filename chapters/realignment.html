@@ -550,11 +550,13 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">import</span> <span class="nn">scipy.io</span>
-<span class="kn">import</span> <span class="nn">cv2</span>
+
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span> <span class="k">as</span> <span class="n">im</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
 <span class="kn">import</span> <span class="nn">stitching</span>
+<span class="kn">import</span> <span class="nn">scipy.io</span>
 
 <span class="c1"># If running on colab:</span>
 <span class="c1"># import sys</span>
@@ -574,6 +576,7 @@ title="Print to PDF"
 <span class="c1"># airborne_data_path = &quot;../data/AirborneDataMini.mat&quot;</span>
 
 <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">airborne_data_path</span><span class="p">)</span>
+<span class="n">util</span><span class="o">.</span><span class="n">initializeFolders</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -705,8 +708,8 @@ The images are each 640x480 and 3 channel (RGB), and there are 406 in total.</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Stitching failed for the following images:
- [36, 37, 37, 38, 38, 39, 39, 40, 40, 41, 41, 42, 42, 43, 43, 44, 44, 45, 45, 46, 46, 47, 47, 48, 48, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 57, 57, 58, 58, 59, 59, 60, 60, 61, 61, 62, 62, 63, 63, 64, 64, 65, 65, 66, 66, 67, 67, 68, 68, 69, 69, 70, 128, 129, 207, 208, 248, 249, 267, 268, 282, 283, 294, 295, 309, 310, 310, 311, 342, 343, 359, 360, 375, 376, 382, 383, 385, 386, 394, 395, 403, 404, 404, 405, 405, 406]
-Resulting dataset loss: 12.56%
+ [35, 36, 36, 37, 37, 38, 38, 39, 39, 40, 40, 41, 41, 42, 42, 43, 43, 44, 44, 45, 45, 46, 46, 47, 47, 48, 48, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 57, 57, 58, 58, 59, 59, 60, 60, 61, 61, 62, 62, 63, 63, 64, 64, 65, 65, 66, 66, 67, 67, 68, 68, 69, 69, 70, 207, 208, 248, 249, 267, 268, 282, 283, 294, 295, 310, 311, 342, 343, 358, 359, 359, 360, 375, 376, 385, 386, 394, 395, 399, 400, 402, 403, 403, 404, 404, 405, 405, 406]
+Resulting dataset loss: 12.81%
 </pre></div>
 </div>
 <img alt="../_images/realignment_19_1.png" src="../_images/realignment_19_1.png" />
@@ -765,8 +768,8 @@ Resulting dataset loss: 12.56%
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6779 RGB keypoints, 403 IR keypoints
-262 matches found
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6607 RGB keypoints, 403 IR keypoints
+263 matches found
 </pre></div>
 </div>
 <img alt="../_images/realignment_24_1.png" src="../_images/realignment_24_1.png" />
@@ -802,8 +805,8 @@ Resulting dataset loss: 12.56%
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2265 RGB keypoints, 385 IR keypoints
-208 matches found
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2276 RGB keypoints, 385 IR keypoints
+211 matches found
 </pre></div>
 </div>
 <img alt="../_images/realignment_26_1.png" src="../_images/realignment_26_1.png" />
@@ -899,7 +902,7 @@ Resulting dataset loss: 12.56%
 </div>
 <div class="cell_output docutils container">
 <img alt="../_images/realignment_32_0.png" src="../_images/realignment_32_0.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Removed 1 bad matches.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Removed 3 bad matches.
 </pre></div>
 </div>
 </div>
@@ -1080,8 +1083,8 @@ Resulting dataset loss: 12.56%
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Poor matches found for the following images: (note, poor quality for image x indicates match_x+1 is poor)
- [32, 33, 34, 69, 109, 110, 138, 145, 147, 148, 149, 150, 151, 165, 173, 175, 186, 204, 207, 208, 209, 211, 212, 213, 214, 222, 236, 240, 245, 250, 264, 265, 267, 269, 270, 274, 284, 285, 286, 287, 288, 291, 295, 296, 298, 300, 302, 303, 304, 305, 307, 308, 329, 330, 331, 332, 333, 334, 335, 336, 337, 339, 389]
-Loss from ignored poor quality matches: 15.52%
+ [31, 32, 33, 69, 70, 72, 110, 137, 147, 150, 151, 163, 165, 167, 173, 175, 186, 207, 208, 209, 212, 214, 240, 243, 245, 248, 250, 264, 265, 267, 269, 270, 271, 284, 285, 286, 287, 291, 292, 295, 296, 297, 298, 302, 303, 304, 305, 306, 308, 325, 330, 332, 333, 334, 335, 336, 337, 339, 366, 381, 389]
+Loss from ignored poor quality matches: 15.02%
 </pre></div>
 </div>
 <img alt="../_images/realignment_46_1.png" src="../_images/realignment_46_1.png" />
@@ -1190,8 +1193,8 @@ Loss from ignored poor quality matches: 15.52%
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Successfully realigned 342 images.
-Percentage of total dataset realigned: 84.24%
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Successfully realigned 344 images.
+Percentage of total dataset realigned: 84.73%
 </pre></div>
 </div>
 <img alt="../_images/realignment_52_1.png" src="../_images/realignment_52_1.png" />

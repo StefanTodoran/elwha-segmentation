@@ -494,6 +494,7 @@ title="Print to PDF"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airborne_data_path</span> <span class="o">=</span> <span class="s2">&quot;../data/AirborneData.mat&quot;</span>
 <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">airborne_data_path</span><span class="p">)</span>
 <span class="n">airborne_data</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">airborne_data_path</span><span class="p">)</span>
+<span class="n">original_size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">airborne_data_path</span><span class="p">)</span> 
 </pre></div>
 </div>
 </div>
@@ -526,7 +527,7 @@ title="Print to PDF"
 </div>
 </div>
 </div>
-<p>It is unclear if any of these are important, but they don’t contibute much to the file size and don’t get in our way so no reason to bother ourselves with removing them.</p>
+<p>It is unclear if any of these will prove important to our data processing, but they don’t contibute almost anything to the file size and don’t get in our way so no reason to bother ourselves with removing them.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;imageRGB&#39;</span><span class="p">]))</span>
@@ -557,10 +558,6 @@ title="Print to PDF"
 <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;tempRiver&#39;</span><span class="p">]))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;tempRiver&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">altitude:&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">]))</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">datePDT:&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;datePDT&#39;</span><span class="p">]))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;datePDT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -576,10 +573,6 @@ tempRiver:
 &lt;class &#39;numpy.ndarray&#39;&gt;
 (406, 5)
 
-altitude:
-&lt;class &#39;numpy.ndarray&#39;&gt;
-(406, 1)
-
 datePDT:
 &lt;class &#39;numpy.ndarray&#39;&gt;
 (406,)
@@ -587,12 +580,11 @@ datePDT:
 </div>
 </div>
 </div>
-<p>As far as I know, <code class="docutils literal notranslate"><span class="pre">maskRiver</span></code> and <code class="docutils literal notranslate"><span class="pre">tempRiver</span></code> are abandoned old work from a few years ago when another researched tried to do some processing on this dataset. Trimming them will greatly reduce the dataset size. The <code class="docutils literal notranslate"><span class="pre">altitude</span></code> data may come in handy later, but at the moment it isn’t useful to us.</p>
+<p>It seems <code class="docutils literal notranslate"><span class="pre">maskRiver</span></code> and <code class="docutils literal notranslate"><span class="pre">tempRiver</span></code> are abandoned old work from a few years ago when another researched tried to do some processing on this dataset. Trimming them will greatly reduce the dataset size.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airborne_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;maskRiver&#39;</span><span class="p">)</span>
 <span class="n">airborne_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;tempRiver&#39;</span><span class="p">)</span>
-<span class="n">airborne_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;altitude&#39;</span><span class="p">)</span>
 <span class="n">airborne_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;datePDT&#39;</span><span class="p">)</span>
 <span class="p">;</span>
 </pre></div>
@@ -655,8 +647,8 @@ Zt:
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airborne_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;northings&#39;</span><span class="p">)</span>
-<span class="n">airborne_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;eastings&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># airborne_data.pop(&#39;northings&#39;)</span>
+<span class="c1"># airborne_data.pop(&#39;eastings&#39;)</span>
 <span class="n">airborne_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;Xt&#39;</span><span class="p">)</span>
 <span class="n">airborne_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;Yt&#39;</span><span class="p">)</span>
 <span class="n">airborne_data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;Zt&#39;</span><span class="p">)</span>
@@ -677,7 +669,7 @@ Zt:
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;__header__&#39;, &#39;__version__&#39;, &#39;__globals__&#39;, &#39;imageRGB&#39;, &#39;imageIR&#39;]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;__header__&#39;, &#39;__version__&#39;, &#39;__globals__&#39;, &#39;imageRGB&#39;, &#39;imageIR&#39;, &#39;northings&#39;, &#39;eastings&#39;, &#39;altitude&#39;]
 </pre></div>
 </div>
 </div>
@@ -686,8 +678,10 @@ Zt:
 <p>Once we have chosen what size subset of the data to use, in this case 25 images, we have to decide which images. For this dataset, since the sequence of images matter (we want images next to eachother since we are dealing with misalignment), we will just choose the first 25 images. For other datasets, this may not be the optimal choice.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trimmed_rgb</span> <span class="o">=</span> <span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;imageRGB&#39;</span><span class="p">][:,:,</span><span class="mi">0</span><span class="p">:</span><span class="mi">25</span><span class="p">]</span>
-<span class="n">trimmed_ir</span> <span class="o">=</span> <span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;imageIR&#39;</span><span class="p">][:,:,</span><span class="mi">0</span><span class="p">:</span><span class="mi">25</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">subset_size</span> <span class="o">=</span> <span class="mi">25</span>
+
+<span class="n">trimmed_rgb</span> <span class="o">=</span> <span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;imageRGB&#39;</span><span class="p">][:,:,</span><span class="mi">0</span><span class="p">:</span><span class="n">subset_size</span><span class="p">]</span>
+<span class="n">trimmed_ir</span> <span class="o">=</span> <span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;imageIR&#39;</span><span class="p">][:,:,</span><span class="mi">0</span><span class="p">:</span><span class="n">subset_size</span><span class="p">]</span>
 
 <span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;imageRGB&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trimmed_rgb</span>
 <span class="n">airborne_data</span><span class="p">[</span><span class="s1">&#39;imageIR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trimmed_ir</span>
@@ -717,8 +711,21 @@ Zt:
 <p>After verifying we have succesfully extracted our subset of images, we can tell scipy to save our file.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airborne_data_path</span> <span class="o">=</span> <span class="s2">&quot;../data/AirborneDataMini.mat&quot;</span>
-<span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">savemat</span><span class="p">(</span><span class="n">airborne_data_path</span><span class="p">,</span> <span class="n">airborne_data</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airborne_minidata_path</span> <span class="o">=</span> <span class="s2">&quot;../data/AirborneDataMini.mat&quot;</span>
+<span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">savemat</span><span class="p">(</span><span class="n">airborne_minidata_path</span><span class="p">,</span> <span class="n">airborne_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">minified_size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">airborne_minidata_path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Size reduced by:&quot;</span><span class="p">,</span> <span class="n">original_size</span> <span class="o">-</span> <span class="n">minified_size</span><span class="p">,</span> <span class="s2">&quot;bytes&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Size reduced by: 1382450025 bytes
 </pre></div>
 </div>
 </div>

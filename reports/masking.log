@@ -23,7 +23,7 @@ ir_prefix = "airborne_ir_"
 rgb_folder = "out/realignment/"
 rgb_prefix = "rgb_"
 
-truth_folder = "out/segmentation/"
+truth_folder = "truth/"
 truth_prefix = "truth_"
 
 data = SegmentationDataset(
@@ -36,7 +36,7 @@ loader = DataLoader(data, batch_size=1, shuffle=False, num_workers=12)
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mOSError[0m                                   Traceback (most recent call last)
 Cell [0;32mIn [4], line 10[0m
-[1;32m      7[0m truth_folder [38;5;241m=[39m [38;5;124m"[39m[38;5;124mout/segmentation/[39m[38;5;124m"[39m
+[1;32m      7[0m truth_folder [38;5;241m=[39m [38;5;124m"[39m[38;5;124mtruth/[39m[38;5;124m"[39m
 [1;32m      8[0m truth_prefix [38;5;241m=[39m [38;5;124m"[39m[38;5;124mtruth_[39m[38;5;124m"[39m
 [0;32m---> 10[0m data [38;5;241m=[39m [43mSegmentationDataset[49m[43m([49m
 [1;32m     11[0m [43m    [49m[38;5;124;43m"[39;49m[38;5;124;43m../[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[43mir_folder[49m[43m,[49m[43m [49m[43mrgb_folder[49m[43m,[49m[43m [49m[43mtruth_folder[49m[43m,[49m[43m [49m[43mir_prefix[49m[43m,[49m[43m [49m[43mrgb_prefix[49m[43m,[49m[43m [49m[43mtruth_prefix[49m[43m,[49m[43m [49m
