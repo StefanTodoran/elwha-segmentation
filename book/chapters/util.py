@@ -14,7 +14,7 @@ def initializeFolders():
     if not os.path.exists(folder):
       os.makedirs(folder)
 
-def getSavePath(type, number) -> str:
+def getSavePath(type: str, number: int) -> str:
   if (type == "RGB"):
     return f"../data/img/airborne_{number + 1}.png"
   if (type == "IR"):
