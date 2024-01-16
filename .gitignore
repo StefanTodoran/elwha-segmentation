@@ -1,9 +1,10 @@
 # Ignore the massive dataset
 book/data/Elwha2012.mat
-book/data/Elwha2012Mini.mat
+book/data/Elwha2014.mat
 book/out/
 book/data/img
 book/data/model
+book/learning
 .DS_Store
 .vscode
 

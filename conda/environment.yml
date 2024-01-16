@@ -17,6 +17,7 @@ dependencies:
   - pillow
   - matplotlib
   - gdal
+  - transformers
 
   # Install should be through conda forge, if matplotlib is crashing
   # the kernel, try running `conda install nomkl --channel conda-forge`
@@ -31,3 +32,4 @@ dependencies:
     - torch
     - torchvision
     - git+https://github.com/facebookresearch/segment-anything.git
+    - git+https://github.com/huggingface/transformers.git
