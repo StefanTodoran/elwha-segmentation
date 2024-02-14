@@ -24,6 +24,8 @@ dependencies:
   - nomkl 
 
   - pip:
+    - huggingface_hub
+    - datasets
     - scikit-image
     - pyproj
     - segment-geospatial
