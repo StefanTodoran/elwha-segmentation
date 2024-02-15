@@ -86,6 +86,19 @@ def getPaths(directory: Path, glob: str):
   print(f"Found and loaded {len(paths)} images with glob {glob}.")
   return paths
 
+def writeSetToFile(file_path: str, target_set: set):
+  with open(file_path, "w") as file:
+    for element in target_set:
+      file.write(str(element) + "\n")
+
+def readSetFromFile(file_path: str):
+  loaded_set = set()
+  with open(file_path, "r") as file:
+    for line in file:
+      element = int(line.strip())
+      loaded_set.add(element)
+  return loaded_set
+
 class SupervisedDataset(VisionDataset):
   """
   Adapted from Manpreet Singh Minhas's transfer learning
