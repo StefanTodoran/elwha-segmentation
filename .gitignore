@@ -8,6 +8,7 @@ book/data/model
 book/learning
 .DS_Store
 .vscode
+**/*.hf
 
 # Jupyter Book things
 .bash_history
