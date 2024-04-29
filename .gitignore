@@ -9,6 +9,7 @@ book/learning
 .DS_Store
 .vscode
 **/*.hf
+**/*.pth
 
 # Jupyter Book things
 .bash_history
