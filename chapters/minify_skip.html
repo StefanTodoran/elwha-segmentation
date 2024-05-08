@@ -491,7 +491,7 @@ title="Print to PDF"
 <p>The data used in this book comes in a matlab file, so we will be manipulating it with scipy.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airborne_data_path</span> <span class="o">=</span> <span class="s2">&quot;../data/AirborneData.mat&quot;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airborne_data_path</span> <span class="o">=</span> <span class="s2">&quot;../data/Elwha2012.mat&quot;</span>
 <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">airborne_data_path</span><span class="p">)</span>
 <span class="n">airborne_data</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">airborne_data_path</span><span class="p">)</span>
 <span class="n">original_size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">airborne_data_path</span><span class="p">)</span> 
@@ -711,7 +711,7 @@ Zt:
 <p>After verifying we have succesfully extracted our subset of images, we can tell scipy to save our file.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airborne_minidata_path</span> <span class="o">=</span> <span class="s2">&quot;../data/AirborneDataMini.mat&quot;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airborne_minidata_path</span> <span class="o">=</span> <span class="s2">&quot;../data/Elwha2012Mini.mat&quot;</span>
 <span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">savemat</span><span class="p">(</span><span class="n">airborne_minidata_path</span><span class="p">,</span> <span class="n">airborne_data</span><span class="p">)</span>
 </pre></div>
 </div>

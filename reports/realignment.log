@@ -18,11 +18,11 @@ Traceback (most recent call last):
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
 # We only use this running locally, since this data file is too big for Github.
-airborne_data_path = "../data/AirborneData.mat"
+airborne_data_path = "../data/Elwha2012.mat"
 # If you are running on colab, use this instead:
-# airborne_data_path = "elwha_dataset_realignment/book/data/AirborneDataMini.mat"
+# airborne_data_path = "elwha_dataset_realignment/book/data/Elwha2012Mini.mat"
 # For just using the mini dataset locally:
-# airborne_data_path = "../data/AirborneDataMini.mat"
+# airborne_data_path = "../data/Elwha2012Mini.mat"
 
 assert os.path.exists(airborne_data_path)
 util.initializeFolders()
@@ -31,11 +31,11 @@ util.initializeFolders()
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mAssertionError[0m                            Traceback (most recent call last)
 Cell [0;32mIn [3], line 8[0m
-[1;32m      2[0m airborne_data_path [38;5;241m=[39m [38;5;124m"[39m[38;5;124m../data/AirborneData.mat[39m[38;5;124m"[39m
+[1;32m      2[0m airborne_data_path [38;5;241m=[39m [38;5;124m"[39m[38;5;124m../data/Elwha2012.mat[39m[38;5;124m"[39m
 [1;32m      3[0m [38;5;66;03m# If you are running on colab, use this instead:[39;00m
-[1;32m      4[0m [38;5;66;03m# airborne_data_path = "elwha_dataset_realignment/book/data/AirborneDataMini.mat"[39;00m
+[1;32m      4[0m [38;5;66;03m# airborne_data_path = "elwha_dataset_realignment/book/data/Elwha2012Mini.mat"[39;00m
 [1;32m      5[0m [38;5;66;03m# For just using the mini dataset locally:[39;00m
-[1;32m      6[0m [38;5;66;03m# airborne_data_path = "../data/AirborneDataMini.mat"[39;00m
+[1;32m      6[0m [38;5;66;03m# airborne_data_path = "../data/Elwha2012Mini.mat"[39;00m
 [0;32m----> 8[0m [38;5;28;01massert[39;00m os[38;5;241m.[39mpath[38;5;241m.[39mexists(airborne_data_path)
 [1;32m      9[0m util[38;5;241m.[39minitializeFolders()
 
