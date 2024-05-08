@@ -1,10 +1,15 @@
 # Ignore the massive dataset
-book/data/AirborneData.mat
+book/data/Elwha2012.mat
+book/data/Elwha2014.mat
+book/data/Elwha2012Mini.mat
 book/out/
 book/data/img
 book/data/model
+book/learning
 .DS_Store
 .vscode
+**/*.hf
+**/*.pth
 
 # Jupyter Book things
 .bash_history

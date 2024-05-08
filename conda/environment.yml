@@ -17,12 +17,16 @@ dependencies:
   - pillow
   - matplotlib
   - gdal
+  - transformers
+  - seaborn
 
   # Install should be through conda forge, if matplotlib is crashing
   # the kernel, try running `conda install nomkl --channel conda-forge`
   - nomkl 
 
   - pip:
+    - huggingface_hub
+    - datasets
     - scikit-image
     - pyproj
     - segment-geospatial
@@ -31,3 +35,4 @@ dependencies:
     - torch
     - torchvision
     - git+https://github.com/facebookresearch/segment-anything.git
+    - git+https://github.com/huggingface/transformers.git
