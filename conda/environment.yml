@@ -18,6 +18,7 @@ dependencies:
   - matplotlib
   - gdal
   - transformers
+  - seaborn
 
   # Install should be through conda forge, if matplotlib is crashing
   # the kernel, try running `conda install nomkl --channel conda-forge`
